@@ -1,4 +1,5 @@
 // src/pages/LandingPage.jsx
+import { useNavigate } from 'react-router-dom'
 import './LandingPage.css'
 
 const STATS = [
@@ -39,6 +40,8 @@ const PROOF_AVS = [
 ]
 
 export default function LandingPage() {
+  const navigate = useNavigate()
+  
   return (
     <div className="lp-root">
 
@@ -54,8 +57,12 @@ export default function LandingPage() {
           <li><a href="#subjects">Subjects</a></li>
         </ul>
         <div className="nav-actions">
-          <button className="btn-nav-ghost">Log in</button>
-          <button className="btn-nav-cta">Get started free</button>
+          <button className="btn-nav-ghost" onClick={() => navigate('/login')}>
+            Log in
+          </button>
+          <button className="btn-nav-cta" onClick={() => navigate('/signup')}>
+             Get started free
+          </button>
         </div>
       </nav>
 
@@ -80,10 +87,12 @@ export default function LandingPage() {
           Real people. Real accountability. Real progress.
         </p>
         <div className="hero-btns a4">
-          <button className="btn-hero-main">
+          <button className="btn-hero-main" onClick={() => navigate('/signup')}>
             Find your study group <span className="btn-arrow">→</span>
           </button>
-          <button className="btn-hero-ghost">▷ &nbsp;See how it works</button>
+          <button className="btn-hero-ghost" onClick={() => navigate('/signup')}>
+            ▷ &nbsp;See how it works
+          </button>
         </div>
         <div className="hero-proof a5">
           <div className="proof-avs">
@@ -256,7 +265,9 @@ export default function LandingPage() {
           <div className="cta-badge">✦ Free forever to start</div>
           <h2 className="cta-title">Ready to learn<br /><em>better together?</em></h2>
           <p className="cta-sub">Join 2,400+ learners already making real progress on StudySphere.<br />No credit card required.</p>
-          <button className="btn-cta-main">Join StudySphere free 🚀</button>
+          <button className="btn-cta-main" onClick={() => navigate('/signup')}>
+              Join StudySphere free 🚀
+          </button>
           <div className="cta-note">Takes less than 2 minutes to get started</div>
         </div>
       </section>
