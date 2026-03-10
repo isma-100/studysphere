@@ -1,150 +1,246 @@
 // src/pages/LandingPage.jsx
-// StudySphere — Landing Page Component
+import './LandingPage.css'
+
+const STATS = [
+  { n: '2,400+', l: 'Active learners' },
+  { n: '340',    l: 'Study groups' },
+  { n: '80+',    l: 'Subjects' },
+  { n: '4.9★',   l: 'Avg rating' },
+]
+
+const STEPS = [
+  { num: '01', icon: '✍️', title: 'Create your profile',    desc: 'Add your subjects, availability, and learning goals in under 2 minutes.' },
+  { num: '02', icon: '🔍', title: 'Find your group',         desc: 'Browse or search groups by subject, level, and schedule. Join with one click.' },
+  { num: '03', icon: '🚀', title: 'Start learning together', desc: 'Chat, schedule sessions, share resources, and track your goals — all in one place.' },
+]
+
+const SUBJECTS = [
+  { label: '🐍 Python',           s: 's1' }, { label: '📐 Calculus',         s: 's3' },
+  { label: '🇪🇸 Spanish',         s: 's4' }, { label: '🎨 UI/UX Design',     s: 's2' },
+  { label: '🧬 Biology',          s: 's6' }, { label: '💼 Business',         s: 's1' },
+  { label: '⚛️ Physics',          s: 's3' }, { label: '🇫🇷 French',          s: 's4' },
+  { label: '📊 Data Science',     s: 's2' }, { label: '✍️ Creative Writing', s: 's5' },
+  { label: '🎵 Music Theory',     s: 's6' }, { label: '📜 History',          s: 's1' },
+  { label: '🧪 Chemistry',        s: 's3' }, { label: '💻 Web Dev',          s: 's2' },
+  { label: '🇩🇪 German',          s: 's4' }, { label: '📷 Photography',      s: 's5' },
+  { label: '📈 Economics',        s: 's6' }, { label: '🧠 Psychology',       s: 's1' },
+  { label: '+ many more',         s: 's0' },
+]
+
+const TESTIMONIALS = [
+  { stars: '★★★★★', quote: '"I was struggling with calculus alone for months. Found a group on StudySphere and passed my exam two weeks later. Night and day difference."', name: 'Layla Hassan', role: 'University student, Cairo',        initials: 'L', bg: '#00b5aa' },
+  { stars: '★★★★★', quote: '"The scheduling feature is a game changer. Our Python group meets every Tuesday and it auto-syncs to my Google Calendar. So smooth."',         name: 'Marcus Chen',  role: 'Self-taught developer, Singapore', initials: 'M', bg: '#4a7cf7' },
+  { stars: '★★★★★', quote: '"I\'ve tried so many learning apps. StudySphere is the only one where I actually made real friends. We study Spanish together every weekend."', name: 'Priya Nair',   role: 'Language learner, London',         initials: 'P', bg: '#8b5cf6' },
+]
+
+const PROOF_AVS = [
+  { i: 'A', bg: '#4a7cf7' }, { i: 'M', bg: '#00b5aa' },
+  { i: 'P', bg: '#8b5cf6' }, { i: 'R', bg: '#f59e0b' }, { i: 'K', bg: '#f43f5e' },
+]
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#faf8f4] font-sans">
+    <div className="lp-root">
 
-      {/* ── NAVBAR ── */}
-      <nav className="bg-white border-b border-[#ede9e3] sticky top-0 z-50 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#e07a3a] to-[#c45e20] flex items-center justify-center text-sm shadow-md">
-              🌐
-            </div>
-            <span className="font-serif text-xl font-semibold text-[#1e1b18]">
-              Study<span className="text-[#e07a3a]">Sphere</span>
-            </span>
-          </div>
-
-          {/* Nav links */}
-          <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-[#9e9890]">
-            <a href="#features" className="hover:text-[#e07a3a] transition-colors">Features</a>
-            <a href="#how" className="hover:text-[#e07a3a] transition-colors">How it works</a>
-            <a href="#subjects" className="hover:text-[#e07a3a] transition-colors">Subjects</a>
-          </div>
-
-          {/* CTA buttons */}
-          <div className="flex items-center gap-3">
-            <button className="text-sm font-bold text-[#4a4540] hover:text-[#e07a3a] transition-colors hidden md:block">
-              Log in
-            </button>
-            <button className="bg-gradient-to-br from-[#e07a3a] to-[#c45e20] text-white text-sm font-bold px-5 py-2 rounded-full shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
-              Get started free
-            </button>
-          </div>
+      {/* NAV */}
+      <nav className="lp-nav">
+        <a className="nav-logo" href="#">
+          <div className="logo-icon">🌐</div>
+          <div className="logo-wordmark">Study<em>Sphere</em></div>
+        </a>
+        <ul className="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#subjects">Subjects</a></li>
+        </ul>
+        <div className="nav-actions">
+          <button className="btn-nav-ghost">Log in</button>
+          <button className="btn-nav-cta">Get started free</button>
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="relative bg-white overflow-hidden border-b border-[#ede9e3]">
-
-        {/* Background blobs */}
-        <div className="absolute w-96 h-96 rounded-full bg-[#fdf0e6] blur-[72px] opacity-60 -top-20 -left-20 pointer-events-none" />
-        <div className="absolute w-72 h-72 rounded-full bg-[#e6f3f3] blur-[72px] opacity-50 -bottom-16 -right-16 pointer-events-none" />
-        <div className="absolute w-52 h-52 rounded-full bg-[#ede6f5] blur-[72px] opacity-50 top-12 right-1/4 pointer-events-none" />
-
-        <div className="relative max-w-4xl mx-auto px-6 py-24 text-center">
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-[#fdf0e6] border border-[#f2c4a0] text-[#c45e20] text-xs font-bold px-4 py-1.5 rounded-full mb-8">
-            🌐 Open to students &amp; self-learners everywhere
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-glow" />
+        <div className="hero-dots" />
+        <div className="hero-shape hs1" />
+        <div className="hero-shape hs2" />
+        <div className="hero-shape hs3" />
+        <div className="hero-line" />
+        <div className="hero-badge a1">
+          <span className="badge-ping" />
+          Now open to everyone — students &amp; self-learners
+        </div>
+        <h1 className="hero-title a2">
+          The smarter way<br />
+          to <span className="shimmer-text">learn together</span>
+        </h1>
+        <p className="hero-sub a3">
+          Find study groups that match your subjects, pace, and schedule.
+          Real people. Real accountability. Real progress.
+        </p>
+        <div className="hero-btns a4">
+          <button className="btn-hero-main">
+            Find your study group <span className="btn-arrow">→</span>
+          </button>
+          <button className="btn-hero-ghost">▷ &nbsp;See how it works</button>
+        </div>
+        <div className="hero-proof a5">
+          <div className="proof-avs">
+            {PROOF_AVS.map((av) => (
+              <div key={av.i} className="proof-av" style={{ background: av.bg }}>{av.i}</div>
+            ))}
           </div>
+          <div className="proof-text"><strong>2,400+</strong> learners studying together</div>
+          <div className="proof-sep" />
+          <div className="proof-stars">★★★★★</div>
+          <div className="proof-text"><strong>4.9</strong> rated</div>
+        </div>
+      </section>
 
-          {/* Headline */}
-          <h1 className="font-serif text-5xl md:text-6xl font-semibold text-[#1e1b18] leading-tight tracking-tight mb-6">
-            Your world of<br />
-            <em className="not-italic text-[#e07a3a]">learning together</em>
-          </h1>
+      {/* STATS */}
+      <div className="stats-strip">
+        <div className="stats-inner">
+          {STATS.map((s) => (
+            <div key={s.l} className="stat-col">
+              <div className="stat-n">{s.n}</div>
+              <div className="stat-l">{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-          {/* Subheadline */}
-          <p className="text-lg text-[#4a4540] max-w-xl mx-auto mb-10 leading-relaxed font-medium">
-            Find study groups that match your subjects, pace, and schedule.
-            Real people, real conversations, real progress.
-          </p>
+      {/* FEATURES */}
+      <section className="features" id="features">
+        <div className="features-inner">
+          <div className="sec-header">
+            <div className="sec-tag">Features</div>
+            <h2 className="sec-title">Built for focused<br />learners</h2>
+            <p className="sec-sub">More than a chat room. A complete platform for serious studying.</p>
+          </div>
+          <div className="feat-grid">
 
-          {/* CTA buttons */}
-          <div className="flex flex-wrap justify-center gap-3">
-            <button className="bg-gradient-to-br from-[#e07a3a] to-[#c45e20] text-white font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-              Find a Study Group →
-            </button>
-            <button className="bg-white text-[#4a4540] font-bold px-8 py-3.5 rounded-full border-2 border-[#ede9e3] hover:border-[#e07a3a] hover:text-[#e07a3a] transition-all">
-              Create a Group
-            </button>
+            <div className="fc blue c5">
+              <div className="fi blue">🔍</div>
+              <div className="ft">Smart Group Matching</div>
+              <div className="fd">Filter by subject, level, and availability. Find your perfect study squad — not just any random group.</div>
+              <div className="fc-mock">
+                <div className="mock-topbar">
+                  <div className="mtb-dot" style={{ background: '#ff5f57' }} />
+                  <div className="mtb-dot" style={{ background: '#ffbd2e' }} />
+                  <div className="mtb-dot" style={{ background: '#28ca41' }} />
+                </div>
+                <div className="mock-content">
+                  <div className="ml" style={{ width: '75%', background: '#dbe4ff' }} />
+                  <div style={{ display: 'flex', gap: 5, margin: '8px 0' }}>
+                    <span className="mock-pill" style={{ background: '#eff4ff', color: '#4a7cf7' }}>Python</span>
+                    <span className="mock-pill" style={{ background: '#f5f0ff', color: '#8b5cf6' }}>Beginner</span>
+                    <span className="mock-pill" style={{ background: '#e6fffe', color: '#00b5aa' }}>Online</span>
+                  </div>
+                  <div className="ml" style={{ width: '50%', background: '#dbe4ff' }} />
+                </div>
+              </div>
+            </div>
+
+            <div className="fc teal c4">
+              <div className="fi teal">💬</div>
+              <div className="ft">Real-time Chat</div>
+              <div className="fd">Every group has its own live room. Share resources, ask questions, stay in sync.</div>
+              <div className="fc-mock" style={{ marginTop: '1.25rem' }}>
+                <div className="mock-content chat-mock-body">
+                  <div className="chat-msg-left">
+                    <div className="chat-av" style={{ background: '#00b5aa' }} />
+                    <div className="chat-bub chat-bub-left">Did you solve Q3? 🤔</div>
+                  </div>
+                  <div className="chat-msg-right">
+                    <div className="chat-av" style={{ background: '#4a7cf7' }} />
+                    <div className="chat-bub chat-bub-right">Yes! Check this →</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="fc violet c3">
+              <div className="fi violet">🎯</div>
+              <div className="ft">Goal Tracking</div>
+              <div className="fd">Set targets and watch your progress grow session by session.</div>
+              <div className="fc-stat" style={{ color: '#8b5cf6' }}>87<span style={{ fontSize: '1.4rem', color: '#8892aa' }}>%</span></div>
+              <div style={{ fontSize: '0.75rem', color: '#8892aa', fontWeight: 500 }}>avg goal completion</div>
+            </div>
+
+            <div className="fc amber c7">
+              <div className="fi amber">📅</div>
+              <div className="ft">Session Scheduling + Calendar Sync</div>
+              <div className="fd">Plan study sessions inside your group, set reminders, and sync everything directly to Google Calendar. Never miss a session again.</div>
+            </div>
+
+            <div className="fc rose c5">
+              <div className="fi rose">👤</div>
+              <div className="ft">Rich Learning Profiles</div>
+              <div className="fd">Showcase your subjects, set your weekly availability, and track goals — your profile is your learning identity.</div>
+            </div>
+
           </div>
         </div>
+      </section>
 
-        {/* Stats bar */}
-        <div className="bg-[#faf8f4] border-t border-[#ede9e3]">
-          <div className="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-[#ede9e3]">
-            {[
-              { num: "2,400+", label: "Active learners" },
-              { num: "340",    label: "Study groups" },
-              { num: "80+",    label: "Subjects" },
-              { num: "4.9 ★",  label: "Average rating" },
-            ].map((s) => (
-              <div key={s.label} className="py-5 text-center">
-                <div className="font-serif text-2xl font-semibold text-[#e07a3a]">{s.num}</div>
-                <div className="text-xs font-bold text-[#9e9890] mt-0.5 tracking-wide uppercase">{s.label}</div>
+      {/* HOW IT WORKS */}
+      <section className="how" id="how">
+        <div className="how-noise" />
+        <div className="how-glow-bg" />
+        <div className="how-inner">
+          <div className="sec-header">
+            <div className="sec-tag teal-tag">Simple process</div>
+            <h2 className="sec-title white-title">Up and studying<br />in minutes</h2>
+            <p className="sec-sub dim-sub">No complicated onboarding. Just sign up, find your people, and start.</p>
+          </div>
+          <div className="steps-row">
+            {STEPS.map((s, i) => (
+              <div key={s.num} style={{ display: 'contents' }}>
+                <div className="step-box">
+                  <div className="step-num-tag">Step {s.num}</div>
+                  <div className="step-ico">{s.icon}</div>
+                  <div className="step-title">{s.title}</div>
+                  <div className="step-desc">{s.desc}</div>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className="step-conn"><div className="conn-line" /></div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section id="features" className="max-w-5xl mx-auto px-6 py-20">
-        <div className="text-xs font-black uppercase tracking-widest text-[#e07a3a] mb-2">Why StudySphere</div>
-        <h2 className="font-serif text-3xl font-semibold text-[#1e1b18] mb-12 leading-snug">
-          Everything you need to<br />study smarter, together
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { icon: "🔍", bg: "bg-[#fdf0e6]", title: "Smart Group Matching", desc: "Filter by subject, level, and availability. Find your perfect study squad in seconds." },
-            { icon: "💬", bg: "bg-[#ddeef5]", title: "Real-time Chat",       desc: "Every group has its own chat room. Share notes, ask questions, stay connected." },
-            { icon: "📅", bg: "bg-[#e6f3f3]", title: "Session Scheduling",   desc: "Plan sessions, set reminders, and sync directly with your Google Calendar." },
-            { icon: "👤", bg: "bg-[#ede6f5]", title: "Rich Profiles",        desc: "Show what you're studying, your availability, and your learning goals." },
-          ].map((f) => (
-            <div
-              key={f.title}
-              className="bg-white border border-[#ede9e3] rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all cursor-default"
-            >
-              <div className={`w-11 h-11 ${f.bg} rounded-xl flex items-center justify-center text-xl mb-4`}>
-                {f.icon}
-              </div>
-              <div className="font-black text-sm text-[#1e1b18] mb-1.5">{f.title}</div>
-              <div className="text-sm text-[#9e9890] leading-relaxed font-medium">{f.desc}</div>
-            </div>
-          ))}
+      {/* SUBJECTS */}
+      <section className="subjects" id="subjects">
+        <div className="subjects-inner">
+          <div className="sec-tag">80+ Subjects</div>
+          <h2 className="sec-title">Whatever you're learning,<br />there's a group for it</h2>
+          <div className="subj-grid">
+            {SUBJECTS.map((s) => (
+              <div key={s.label} className={`sp ${s.s}`}>{s.label}</div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section id="how" className="bg-white border-y border-[#ede9e3]">
-        <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-          <div className="text-xs font-black uppercase tracking-widest text-[#e07a3a] mb-2">Simple process</div>
-          <h2 className="font-serif text-3xl font-semibold text-[#1e1b18] mb-14">How it works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: "01", icon: "👤", title: "Create your profile",   desc: "Add your subjects, availability, and learning goals in under 2 minutes." },
-              { step: "02", icon: "🔍", title: "Find your group",        desc: "Browse or search groups by subject and level. Join with one click." },
-              { step: "03", icon: "🚀", title: "Start learning together", desc: "Chat, schedule sessions, and track your progress — all in one place." },
-            ].map((s, i) => (
-              <div key={s.step} className="relative">
-                {/* Connector line */}
-                {i < 2 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-full h-px bg-[#ede9e3] z-0" />
-                )}
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className="w-16 h-16 bg-[#fdf0e6] border-2 border-[#f2c4a0] rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-sm">
-                    {s.icon}
+      {/* TESTIMONIALS */}
+      <section className="testimonials">
+        <div className="test-inner">
+          <div className="sec-tag">Testimonials</div>
+          <h2 className="sec-title">Learners love<br />StudySphere</h2>
+          <div className="test-grid">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="tc">
+                <div className="tc-stars">{t.stars}</div>
+                <div className="tc-quote">{t.quote}</div>
+                <div className="tc-footer-row">
+                  <div className="tc-av" style={{ background: t.bg }}>{t.initials}</div>
+                  <div>
+                    <div className="tc-name">{t.name}</div>
+                    <div className="tc-role">{t.role}</div>
                   </div>
-                  <div className="text-xs font-black text-[#e07a3a] tracking-widest mb-1">{s.step}</div>
-                  <div className="font-black text-[#1e1b18] mb-2">{s.title}</div>
-                  <div className="text-sm text-[#9e9890] leading-relaxed font-medium max-w-[200px]">{s.desc}</div>
                 </div>
               </div>
             ))}
@@ -152,58 +248,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── SUBJECTS ── */}
-      <section id="subjects" className="max-w-5xl mx-auto px-6 py-20">
-        <div className="text-xs font-black uppercase tracking-widest text-[#e07a3a] mb-2">80+ Subjects</div>
-        <h2 className="font-serif text-3xl font-semibold text-[#1e1b18] mb-10">Whatever you're studying,<br />we've got a group for it</h2>
-        <div className="flex flex-wrap gap-3">
-          {[
-            { label: "🐍 Python",        bg: "bg-[#ddeef5]", c: "text-[#3a7fa0]" },
-            { label: "📐 Mathematics",   bg: "bg-[#e6f3f3]", c: "text-[#3a8c8a]" },
-            { label: "🇪🇸 Spanish",      bg: "bg-[#fdf0e6]", c: "text-[#c45e20]" },
-            { label: "🎨 UI/UX Design",  bg: "bg-[#ede6f5]", c: "text-[#7a5a9e]" },
-            { label: "🧬 Biology",        bg: "bg-[#e2f0ec]", c: "text-[#3a8a6a]" },
-            { label: "💼 Business",       bg: "bg-[#e6f3f3]", c: "text-[#3a8c8a]" },
-            { label: "⚛️ Physics",        bg: "bg-[#ddeef5]", c: "text-[#3a7fa0]" },
-            { label: "🇫🇷 French",        bg: "bg-[#fdf0e6]", c: "text-[#c45e20]" },
-            { label: "📊 Data Science",  bg: "bg-[#ede6f5]", c: "text-[#7a5a9e]" },
-            { label: "✍️ Creative Writing",bg:"bg-[#fdf0e6]", c: "text-[#c45e20]" },
-            { label: "🎵 Music Theory",  bg: "bg-[#e2f0ec]", c: "text-[#3a8a6a]" },
-            { label: "📜 History",        bg: "bg-[#ddeef5]", c: "text-[#3a7fa0]" },
-          ].map((s) => (
-            <span
-              key={s.label}
-              className={`${s.bg} ${s.c} text-sm font-bold px-4 py-2 rounded-full border border-transparent hover:scale-105 transition-transform cursor-default`}
-            >
-              {s.label}
-            </span>
-          ))}
-          <span className="bg-[#faf8f4] text-[#9e9890] text-sm font-bold px-4 py-2 rounded-full border border-[#ede9e3]">
-            + many more
-          </span>
+      {/* FINAL CTA */}
+      <section className="cta-section">
+        <div className="cta-box">
+          <div className="cta-bg-glow" />
+          <div className="cta-dots" />
+          <div className="cta-badge">✦ Free forever to start</div>
+          <h2 className="cta-title">Ready to learn<br /><em>better together?</em></h2>
+          <p className="cta-sub">Join 2,400+ learners already making real progress on StudySphere.<br />No credit card required.</p>
+          <button className="btn-cta-main">Join StudySphere free 🚀</button>
+          <div className="cta-note">Takes less than 2 minutes to get started</div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section className="bg-gradient-to-br from-[#e07a3a] to-[#c45e20] py-20 text-center relative overflow-hidden">
-        <div className="absolute w-72 h-72 rounded-full bg-white opacity-5 -top-16 -left-16 pointer-events-none" />
-        <div className="absolute w-56 h-56 rounded-full bg-white opacity-5 -bottom-10 -right-10 pointer-events-none" />
-        <div className="relative max-w-xl mx-auto px-6">
-          <h2 className="font-serif text-4xl font-semibold text-white mb-4 leading-tight">
-            Ready to learn better, together?
-          </h2>
-          <p className="text-white/75 text-lg mb-8 font-medium">
-            Join 2,400+ learners already finding their study community on StudySphere.
-          </p>
-          <button className="bg-white text-[#c45e20] font-black px-10 py-4 rounded-full text-lg hover:shadow-2xl hover:-translate-y-1 transition-all">
-            Join StudySphere — it's free 🚀
-          </button>
+      {/* FOOTER */}
+      <footer className="lp-footer">
+        <div className="f-logo">Study<em>Sphere</em></div>
+        <div className="f-copy">© 2026 StudySphere · Built for learners everywhere</div>
+        <div className="f-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Contact</a>
         </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="bg-[#1e1b18] text-white/40 text-sm text-center py-6 font-medium">
-        © 2026 StudySphere · Built with ❤️ for learners everywhere
       </footer>
 
     </div>
