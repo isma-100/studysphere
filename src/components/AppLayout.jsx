@@ -5,12 +5,14 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import DMInbox from './DMInbox'
 import DMWindow from './DMWindow'
+import PageTransition from './PageTransition'
 import './AppLayout.css'
 
 const NAV_ITEMS = [
-  { path: '/dashboard', icon: '⚡', label: 'Dashboard'  },
-  { path: '/browse',    icon: '🔍', label: 'Browse'     },
-  { path: '/profile',   icon: '👤', label: 'My Profile' },
+  { path: '/dashboard',     icon: '⚡', label: 'Dashboard'     },
+  { path: '/browse',        icon: '🔍', label: 'Browse'        },
+  { path: '/notifications', icon: '🔔', label: 'Notifications' },
+  { path: '/profile',       icon: '👤', label: 'Profile'       },
 ]
 
 export default function AppLayout({ children }) {
@@ -67,11 +69,11 @@ export default function AppLayout({ children }) {
         </div>
       </aside>
 
-      <main className="app-main">{children}</main>
+      <main className="app-main">
+        <PageTransition>{children}</PageTransition>
+      </main>
 
-      {openConv && (
-        <DMWindow conv={openConv} onClose={() => setOpenConv(null)} />
-      )}
+      {openConv && <DMWindow conv={openConv} onClose={() => setOpenConv(null)} />}
     </div>
   )
 }

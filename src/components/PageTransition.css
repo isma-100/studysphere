@@ -1,0 +1,4 @@
+/* PageTransition.css */
+.pt-root { transition: opacity .15s ease, transform .15s ease; }
+.pt-in  { opacity: 1; transform: translateY(0); }
+.pt-out { opacity: 0; transform: translateY(8px); }

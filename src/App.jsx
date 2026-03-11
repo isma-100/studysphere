@@ -14,6 +14,8 @@ import BrowsePage         from './pages/BrowsePage'
 import CreateGroupPage    from './pages/CreateGroupPage'
 import GroupChatPage      from './pages/GroupChatPage'
 import VideoCallPage      from './pages/VideoCallPage'
+import ProfilePage        from './pages/ProfilePage'
+import NotificationsPage  from './pages/NotificationsPage'
 
 export default function App() {
   return (
@@ -31,6 +33,8 @@ export default function App() {
             <Route path="/groups/create"   element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
             <Route path="/groups/:id"      element={<ProtectedRoute><GroupChatPage /></ProtectedRoute>} />
             <Route path="/groups/:id/call" element={<ProtectedRoute><VideoCallPage /></ProtectedRoute>} />
+            <Route path="/profile"         element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/notifications"   element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
             <Route path="*"                element={<Navigate to="/" replace />} />
           </Routes>
         </DMProvider>
