@@ -1,0 +1,221 @@
+/* ============================================================
+   AppLayout.css — Shared app shell
+   Dark sidebar + light main content
+   ============================================================ */
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+@keyframes spin   { to { transform: rotate(360deg) } }
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fc;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #0a0f1e;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 0.55rem;
+  text-decoration: none; padding: 0.25rem 0.5rem;
+  margin-bottom: 2rem;
+}
+.sidebar-logo-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, #00d4c8, #0099ff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  box-shadow: 0 0 12px rgba(0,212,200,0.35);
+}
+.sidebar-logo-text {
+  font-weight: 800; font-size: 1.05rem;
+  color: white; letter-spacing: -0.03em;
+}
+.sidebar-logo-text em { font-style: normal; color: #00d4c8; }
+
+/* Nav links */
+.sidebar-nav {
+  display: flex; flex-direction: column; gap: 0.25rem;
+}
+.sidebar-link {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.65rem 0.75rem; border-radius: 10px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.875rem; font-weight: 600;
+  transition: all 0.2s; position: relative;
+}
+.sidebar-link:hover {
+  color: white;
+  background: rgba(255,255,255,0.06);
+}
+.sidebar-link.active {
+  color: white;
+  background: rgba(0,212,200,0.1);
+}
+.sl-icon { font-size: 1rem; width: 20px; text-align: center; }
+.sl-label { flex: 1; }
+.sl-pip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #00d4c8;
+  box-shadow: 0 0 8px rgba(0,212,200,0.6);
+}
+
+/* Create group button */
+.sidebar-create-btn {
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  margin-top: 1.25rem;
+  padding: 0.65rem 1rem; border-radius: 10px;
+  background: #00d4c8; color: #0a0f1e;
+  font-size: 0.875rem; font-weight: 800;
+  text-decoration: none; transition: all 0.2s;
+  letter-spacing: -0.01em;
+  box-shadow: 0 0 20px rgba(0,212,200,0.25);
+}
+.sidebar-create-btn:hover {
+  background: #00ede5;
+  transform: translateY(-1px);
+  box-shadow: 0 0 28px rgba(0,212,200,0.4);
+}
+
+.sidebar-spacer { flex: 1; }
+
+/* User block */
+.sidebar-user {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0.75rem; border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.su-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #00d4c8, #4a7cf7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 800; color: white;
+  flex-shrink: 0;
+}
+.su-info { flex: 1; min-width: 0; }
+.su-name {
+  font-size: 0.78rem; font-weight: 700; color: white;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.su-email {
+  font-size: 0.65rem; color: rgba(255,255,255,0.3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.su-logout {
+  background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,0.3); font-size: 0.9rem;
+  padding: 0.25rem; border-radius: 6px; transition: all 0.2s;
+  font-family: inherit;
+}
+.su-logout:hover { color: #f43f5e; background: rgba(244,63,94,0.1); }
+
+/* ── MAIN CONTENT ── */
+.app-main {
+  margin-left: 240px;
+  flex: 1;
+  min-height: 100vh;
+  background: #f8f9fc;
+}
+
+/* ── PAGE WRAPPER (used inside each page) ── */
+.page-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  animation: fadeUp 0.5s cubic-bezier(.22,.68,0,1.1) both;
+}
+
+/* ── SHARED PAGE HEADER ── */
+.page-header {
+  margin-bottom: 2.5rem;
+}
+.page-eyebrow {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #00b5aa; margin-bottom: 0.4rem;
+}
+.page-title {
+  font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.04em; color: #0a0f1e; line-height: 1.1;
+}
+.page-sub {
+  font-size: 0.9rem; color: #8892aa; font-weight: 400;
+  margin-top: 0.4rem; line-height: 1.6;
+}
+
+/* ── SHARED CARD ── */
+.app-card {
+  background: white;
+  border: 1px solid #e8eaf2;
+  border-radius: 16px;
+  transition: all 0.25s;
+}
+.app-card:hover {
+  box-shadow: 0 8px 32px rgba(10,15,30,0.10);
+  transform: translateY(-2px);
+}
+
+/* ── SPINNER ── */
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid rgba(10,15,30,0.15);
+  border-top-color: #00d4c8;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+.full-spinner {
+  min-height: 60vh;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem;
+}
+.full-spinner p { font-size: 0.875rem; color: #8892aa; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.empty-state .es-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty-state h3 {
+  font-weight: 800; font-size: 1.15rem;
+  letter-spacing: -0.03em; color: #0a0f1e; margin-bottom: 0.5rem;
+}
+.empty-state p { font-size: 0.875rem; color: #8892aa; line-height: 1.6; max-width: 320px; margin: 0 auto; }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.25rem 0.65rem; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
+}
+.badge-teal   { background: rgba(0,212,200,0.1);  color: #00b5aa;  border: 1px solid rgba(0,212,200,0.2); }
+.badge-blue   { background: rgba(74,124,247,0.1); color: #4a7cf7;  border: 1px solid rgba(74,124,247,0.2); }
+.badge-green  { background: rgba(16,185,129,0.1); color: #10b981;  border: 1px solid rgba(16,185,129,0.2); }
+.badge-amber  { background: rgba(245,158,11,0.1); color: #d97706;  border: 1px solid rgba(245,158,11,0.2); }
+.badge-muted  { background: #f8f9fc; color: #8892aa; border: 1px solid #e8eaf2; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .sidebar { width: 60px; padding: 1rem 0.5rem; }
+  .sidebar-logo-text,
+  .sl-label,
+  .sidebar-create-btn span:last-child,
+  .su-info, .su-logout { display: none; }
+  .sidebar-create-btn { padding: 0.65rem; font-size: 1.1rem; }
+  .app-main { margin-left: 60px; }
+  .page-wrap { padding: 1.5rem 1rem; }
+}
