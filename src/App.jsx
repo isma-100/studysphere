@@ -11,7 +11,7 @@ import ResetPasswordPage  from './pages/ResetPasswordPage'
 import DashboardPage      from './pages/DashboardPage'
 import BrowsePage         from './pages/BrowsePage'
 import CreateGroupPage    from './pages/CreateGroupPage'
-import GroupDetailPage    from './pages/GroupDetailPage'
+import GroupChatPage      from './pages/GroupChatPage'
 
 export default function App() {
   return (
@@ -23,11 +23,11 @@ export default function App() {
           <Route path="/login"           element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password"  element={<ResetPasswordPage />} />
-          <Route path="/dashboard"       element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/browse"          element={<ProtectedRoute><BrowsePage /></ProtectedRoute>} />
-          <Route path="/groups/create"   element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
-          <Route path="/groups/:id"      element={<ProtectedRoute><GroupDetailPage /></ProtectedRoute>} />
-          <Route path="*"                element={<Navigate to="/" replace />} />
+          <Route path="/dashboard"     element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/browse"        element={<ProtectedRoute><BrowsePage /></ProtectedRoute>} />
+          <Route path="/groups/create" element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
+          <Route path="/groups/:id"    element={<ProtectedRoute><GroupChatPage /></ProtectedRoute>} />
+          <Route path="*"              element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
