@@ -1,7 +1,8 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
-import ProtectedRoute from './components/ProtectedRoute'
+import { DMProvider }   from './context/DMContext'
+import ProtectedRoute   from './components/ProtectedRoute'
 
 import LandingPage        from './pages/LandingPage'
 import SignUpPage         from './pages/SignUpPage'
@@ -12,23 +13,27 @@ import DashboardPage      from './pages/DashboardPage'
 import BrowsePage         from './pages/BrowsePage'
 import CreateGroupPage    from './pages/CreateGroupPage'
 import GroupChatPage      from './pages/GroupChatPage'
+import VideoCallPage      from './pages/VideoCallPage'
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/"                element={<LandingPage />} />
-          <Route path="/signup"          element={<SignUpPage />} />
-          <Route path="/login"           element={<LoginPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password"  element={<ResetPasswordPage />} />
-          <Route path="/dashboard"     element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/browse"        element={<ProtectedRoute><BrowsePage /></ProtectedRoute>} />
-          <Route path="/groups/create" element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
-          <Route path="/groups/:id"    element={<ProtectedRoute><GroupChatPage /></ProtectedRoute>} />
-          <Route path="*"              element={<Navigate to="/" replace />} />
-        </Routes>
+        <DMProvider>
+          <Routes>
+            <Route path="/"                element={<LandingPage />} />
+            <Route path="/signup"          element={<SignUpPage />} />
+            <Route path="/login"           element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password"  element={<ResetPasswordPage />} />
+            <Route path="/dashboard"       element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/browse"          element={<ProtectedRoute><BrowsePage /></ProtectedRoute>} />
+            <Route path="/groups/create"   element={<ProtectedRoute><CreateGroupPage /></ProtectedRoute>} />
+            <Route path="/groups/:id"      element={<ProtectedRoute><GroupChatPage /></ProtectedRoute>} />
+            <Route path="/groups/:id/call" element={<ProtectedRoute><VideoCallPage /></ProtectedRoute>} />
+            <Route path="*"                element={<Navigate to="/" replace />} />
+          </Routes>
+        </DMProvider>
       </AuthProvider>
     </BrowserRouter>
   )

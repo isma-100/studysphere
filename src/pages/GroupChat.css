@@ -204,3 +204,16 @@ kbd{font-family:inherit;font-size:.65rem;background:#eef0f6;border:1px solid #dd
 .dm-send:disabled{cursor:not-allowed}
 
 @media(max-width:768px){.members-panel{display:none}.chat-header{padding:0 1rem}.chat-input-wrap{padding:.65rem 1rem .85rem}.msg-row{padding:0 1rem}.chat-welcome{padding:1.5rem 1rem 1rem}.dm-modal{width:calc(100vw - 2rem)}}
+
+/* Video call button in header */
+.ch-call-btn {
+  background: rgba(0,212,200,0.1) !important;
+  border-color: rgba(0,212,200,0.3) !important;
+  color: #00b5aa !important;
+  text-decoration: none;
+}
+.ch-call-btn:hover {
+  background: rgba(0,212,200,0.2) !important;
+  border-color: #00d4c8 !important;
+  color: #00d4c8 !important;
+}

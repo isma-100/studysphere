@@ -1,11 +1,12 @@
 // src/pages/GroupChatPage.jsx
 // Phase 4 UPGRADED — attachments, YouTube embeds, reactions,
-// edit/delete, message search, DMs between group members
+// edit/delete, message search, DMs via DMContext, video call button
 
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import { useDM } from '../context/DMContext'
 import AppLayout from '../components/AppLayout'
 import './GroupChat.css'
 
@@ -83,20 +84,19 @@ export default function GroupChatPage(){
   const[reactionFor,setReactionFor]=useState(null)
   const[uploading,setUploading]=useState(false)
   const[uploadPrev,setUploadPrev]=useState(null)
+  // DM is now handled by DMContext + DMWindow via AppLayout
+  // We just need to know which member to open a DM with
   const[dmTarget,setDmTarget]=useState(null)
-  const[dmMessages,setDmMessages]=useState([])
-  const[dmInput,setDmInput]=useState('')
+  const{getOrCreateConv,openConversation}=useDM()
 
   const bottomRef=useRef(null)
   const scrollRef=useRef(null)
   const inputRef=useRef(null)
   const fileRef=useRef(null)
   const chanRef=useRef(null)
-  const dmChanRef=useRef(null)
 
   useEffect(()=>{loadGroup()},[id])
   useEffect(()=>{if(atBottom){scrollToBottom('smooth');setNewCount(0)}},[messages])
-  useEffect(()=>{if(dmTarget)loadDMs(dmTarget)},[dmTarget])
   useEffect(()=>{
     const fn=e=>{if(e.key==='Escape'){setReactionFor(null);setSearchOpen(false)}}
     window.addEventListener('keydown',fn)
@@ -138,21 +138,12 @@ export default function GroupChatPage(){
     chanRef.current=ch
   }
 
-  async function loadDMs(member){
-    const cid=dmChanId(user.id,member.user_id)
-    const{data}=await supabase.from('direct_messages')
-      .select(`id,content,created_at,sender_id,users(full_name,email)`)
-      .eq('channel_id',cid).order('created_at',{ascending:true}).limit(100)
-    if(data)setDmMessages(data)
-    dmChanRef.current?.unsubscribe()
-    const ch=supabase.channel(`dm-${cid}`)
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'direct_messages',filter:`channel_id=eq.${cid}`},
-        async p=>{
-          const{data:s}=await supabase.from('users').select('full_name,email').eq('id',p.new.sender_id).single()
-          setDmMessages(prev=>[...prev,{...p.new,users:s}])
-        })
-      .subscribe()
-    dmChanRef.current=ch
+  // Open DM via DMContext — DMWindow handled globally in AppLayout
+  function handleOpenDM(member) {
+    const cid = dmChanId(user.id, member.user_id)
+    const conv = getOrCreateConv(cid, member.users)
+    openConversation(cid)
+    setDmTarget({ conv, member })
   }
 
   function scrollToBottom(b='smooth'){bottomRef.current?.scrollIntoView({behavior:b})}
@@ -315,6 +306,7 @@ export default function GroupChatPage(){
             </div>
           </div>
           <div className="ch-right">
+            <Link to={`/groups/${id}/call`} className="ch-icon-btn ch-call-btn" title="Start video call">📹 Call</Link>
             <button className={`ch-icon-btn${searchOpen?' active':''}`} onClick={()=>setSearchOpen(v=>!v)} title="Search">🔍</button>
             <button className={`ch-icon-btn${showMembers?' active':''}`} onClick={()=>setShowMembers(v=>!v)} title="Members">👥 {mc}</button>
           </div>
@@ -486,7 +478,7 @@ export default function GroupChatPage(){
                         <div className="mp-name">{isMe?'You':name}</div>
                         {m.role==='admin'&&<div className="mp-role">Admin</div>}
                       </div>
-                      {!isMe&&<button className="mp-dm-btn" onClick={()=>setDmTarget(m)} title={`DM ${name}`}>💬</button>}
+                      {!isMe&&<button className="mp-dm-btn" onClick={()=>handleOpenDM(m)} title={`DM ${name}`}>💬</button>}
                     </div>
                   )
                 })}
@@ -495,39 +487,6 @@ export default function GroupChatPage(){
           )}
         </div>
       </div>
-
-      {/* DM MODAL */}
-      {dmTarget&&(
-        <div className="dm-overlay" onClick={()=>{setDmTarget(null);dmChanRef.current?.unsubscribe()}}>
-          <div className="dm-modal" onClick={e=>e.stopPropagation()}>
-            <div className="dm-header">
-              <div className="dm-av" style={{background:avatarGrad(dmTarget.user_id)}}>{initials(dname(dmTarget.users))}</div>
-              <div><div className="dm-name">{dname(dmTarget.users)}</div><div className="dm-sub">Direct Message</div></div>
-              <button className="dm-close" onClick={()=>{setDmTarget(null);dmChanRef.current?.unsubscribe()}}>✕</button>
-            </div>
-            <div className="dm-messages">
-              {dmMessages.length===0&&<div className="dm-empty">No messages yet. Say hello 👋</div>}
-              {dmMessages.map(m=>{
-                const isMe=m.sender_id===user.id
-                return(
-                  <div key={m.id} className={`dm-msg${isMe?' dm-me':''}`}>
-                    {!isMe&&<div className="dm-msg-av" style={{background:avatarGrad(m.sender_id)}}>{initials(dname(m.users))}</div>}
-                    <div className="dm-bubble">{m.content}</div>
-                    <span className="dm-time">{fmtTime(m.created_at)}</span>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="dm-input-row">
-              <input className="dm-input" placeholder="Type a message…" value={dmInput}
-                onChange={e=>setDmInput(e.target.value)}
-                onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();sendDm()}}}
-                autoFocus/>
-              <button className={`dm-send${dmInput.trim()?' ready':''}`} onClick={sendDm} disabled={!dmInput.trim()}>↑</button>
-            </div>
-          </div>
-        </div>
-      )}
     </AppLayout>
   )
 }
