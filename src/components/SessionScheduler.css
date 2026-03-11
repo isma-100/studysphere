@@ -1,0 +1,82 @@
+/* SessionScheduler.css */
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.sched-wrap { border-top:1px solid #f0f2f8; padding:1rem 1.25rem; }
+
+.sched-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:.75rem; }
+.sched-title  { font-size:.78rem; font-weight:800; color:#8892aa; letter-spacing:.06em; text-transform:uppercase; display:flex; align-items:center; gap:.4rem; }
+.sched-badge  { background:#00d4c8; color:white; font-size:.65rem; padding:.1rem .45rem; border-radius:100px; }
+
+.sched-add-btn {
+  padding:.3rem .75rem; border-radius:100px;
+  background:#0a0f1e; border:none; color:white;
+  font-size:.72rem; font-weight:700; cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif; transition:all .2s;
+}
+.sched-add-btn:hover { background:#1a2240; }
+
+/* Form */
+.sched-form {
+  background:#f8f9fc; border:1px solid #e8eaf2; border-radius:14px;
+  padding:1rem; margin-bottom:1rem;
+  display:flex; flex-direction:column; gap:.6rem;
+  animation:slideDown .2s ease both;
+}
+.sched-input {
+  width:100%; box-sizing:border-box;
+  background:white; border:1.5px solid #e8eaf2; border-radius:9px;
+  padding:.55rem .8rem; font-size:.82rem;
+  font-family:'Plus Jakarta Sans',sans-serif; color:#0a0f1e;
+  outline:none; transition:all .2s;
+}
+.sched-input:focus { border-color:#00d4c8; box-shadow:0 0 0 3px rgba(0,212,200,.08); }
+.sched-textarea { resize:vertical; min-height:56px; }
+.sched-row   { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+.sched-field { display:flex; flex-direction:column; gap:.25rem; }
+.sched-label { font-size:.65rem; font-weight:700; color:#8892aa; text-transform:uppercase; letter-spacing:.05em; }
+.sched-create-btn {
+  background:#0a0f1e; color:white; border:none; border-radius:9px;
+  padding:.6rem; font-weight:800; font-size:.82rem; cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif; transition:all .2s;
+}
+.sched-create-btn:hover:not(:disabled) { background:#1a2240; }
+.sched-create-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* List */
+.sched-list { display:flex; flex-direction:column; gap:.5rem; }
+.sched-item {
+  display:flex; align-items:center; gap:.75rem;
+  background:white; border:1px solid #e8eaf2; border-radius:12px;
+  padding:.75rem 1rem; transition:all .2s;
+}
+.sched-item:hover { border-color:#00d4c8; box-shadow:0 4px 16px rgba(0,212,200,.08); }
+.sched-item.past { opacity:.55; }
+.si-left  { flex:1; min-width:0; display:flex; gap:.75rem; align-items:flex-start; }
+.si-time-badge { flex-shrink:0; text-align:center; min-width:60px; }
+.si-date      { font-size:.72rem; font-weight:700; color:#4a7cf7; white-space:nowrap; }
+.si-countdown { font-size:.62rem; font-weight:800; color:#00b5aa; margin-top:.15rem; white-space:nowrap; }
+.si-info { flex:1; min-width:0; }
+.si-title { font-size:.85rem; font-weight:700; color:#0a0f1e; margin-bottom:.15rem; }
+.si-desc  { font-size:.75rem; color:#8892aa; margin-bottom:.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.si-meta  { font-size:.68rem; color:#b0b8cc; font-weight:500; display:flex; gap:.3rem; flex-wrap:wrap; }
+.si-right { display:flex; align-items:center; gap:.35rem; flex-shrink:0; }
+.si-rsvp-btns { display:flex; gap:.25rem; }
+.si-rsvp {
+  width:26px; height:26px; border-radius:7px;
+  background:#f0f2f8; border:1.5px solid transparent;
+  font-size:.7rem; font-weight:800; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s; color:#8892aa;
+}
+.si-rsvp.active[title*="going"]:not([title*="Can"]) { background:#10b981; color:white; border-color:#10b981; }
+.si-rsvp.active[title="Maybe"]  { background:#f59e0b; color:white; border-color:#f59e0b; }
+.si-rsvp.active[title*="Can"]   { background:#f43f5e; color:white; border-color:#f43f5e; }
+.si-rsvp:hover { border-color:#0a0f1e; color:#0a0f1e; }
+.si-delete { background:none; border:none; font-size:.85rem; cursor:pointer; opacity:.4; transition:.15s; padding:.25rem; }
+.si-delete:hover { opacity:1; }
+
+/* Empty / loading */
+.sched-empty  { text-align:center; padding:1.5rem; color:#8892aa; font-size:.82rem; }
+.sched-empty span { font-size:2rem; display:block; margin-bottom:.5rem; }
+.sched-empty p { line-height:1.6; }
+.sched-loading { padding:.75rem; color:#b0b8cc; font-size:.78rem; text-align:center; }

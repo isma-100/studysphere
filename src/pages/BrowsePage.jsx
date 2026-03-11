@@ -1,11 +1,16 @@
 // src/pages/BrowsePage.jsx
 import { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import SmartMatch from '../components/SmartMatch'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import AppLayout from '../components/AppLayout'
 import './Browse.css'
 
 export default function BrowsePage() {
+  const { user } = useAuth()
+  const [userGroups, setUserGroups] = useState([])
+  const [profile, setProfile] = useState(null)
   const [groups,   setGroups]   = useState([])
   const [subjects, setSubjects] = useState([])
   const [search,   setSearch]   = useState('')
@@ -13,8 +18,16 @@ export default function BrowsePage() {
   const [mode,     setMode]     = useState('all') // all | online | inperson
   const [loading,  setLoading]  = useState(true)
 
-  useEffect(() => { fetchSubjects() }, [])
+  useEffect(() => { fetchSubjects(); fetchUserData() }, [])
   useEffect(() => { fetchGroups() }, [search, subject, mode])
+
+  async function fetchUserData() {
+    if (!user) return
+    const { data: gm } = await supabase.from('group_members').select('group_id, groups(id,name)').eq('user_id', user.id)
+    if (gm) setUserGroups(gm)
+    const { data: prof } = await supabase.from('users').select('full_name, bio').eq('id', user.id).single()
+    if (prof) setProfile(prof)
+  }
 
   async function fetchSubjects() {
     const { data } = await supabase.from('subjects').select('id, name, icon, color').order('name')
@@ -84,6 +97,9 @@ export default function BrowsePage() {
             ))}
           </div>
         </div>
+
+        {/* AI Smart Match */}
+        <SmartMatch groups={groups} userGroups={userGroups} userProfile={profile || {}} />
 
         {/* Subject filter pills */}
         <div className="subject-pills">
