@@ -249,3 +249,99 @@ kbd{font-family:inherit;font-size:.65rem;background:#eef0f6;border:1px solid #dd
 .mp-av  { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:800; color:white; flex-shrink:0; }
 .mp-name{ font-size:.82rem; font-weight:700; color:#0a0f1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .mp-role{ font-size:.62rem; font-weight:700; color:#00b5aa; text-transform:uppercase; letter-spacing:.05em; margin-top:.1rem; }
+
+/* ============================================================
+   MOBILE IMPROVEMENTS + MORE MENU + LEAVE/DELETE
+   ============================================================ */
+
+/* Hide label text on small screens to save space */
+@media (max-width: 600px) {
+  .btn-label { display: none; }
+  .ch-hide-sm { display: none; }
+  .ch-icon-btn { padding: .4rem .6rem; font-size: .8rem; }
+  .chat-header { padding: 0 .75rem; height: 52px; }
+  .ch-name { font-size: .88rem; }
+  .ch-meta { display: none; } /* hide meta row on very small screens */
+}
+
+/* ── ⋯ More menu ── */
+.ch-more-wrap {
+  position: relative;
+}
+.ch-more-btn {
+  font-size: 1.1rem !important;
+  letter-spacing: .05em;
+  padding: .35rem .6rem !important;
+}
+.ch-more-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: white;
+  border: 1.5px solid #e8eaf2;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(10,15,30,.12);
+  min-width: 200px;
+  z-index: 200;
+  overflow: hidden;
+  animation: fadeUp .15s ease both;
+}
+.ch-more-wrap:hover .ch-more-menu,
+.ch-more-wrap:focus-within .ch-more-menu {
+  display: flex;
+  flex-direction: column;
+}
+.ch-more-item {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .75rem 1rem;
+  font-size: .83rem;
+  font-weight: 600;
+  color: #0a0f1e;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  text-align: left;
+  transition: background .15s;
+}
+.ch-more-item:hover {
+  background: #f8f9fc;
+}
+.ch-more-danger {
+  color: #f43f5e !important;
+}
+.ch-more-danger:hover {
+  background: #fff0f3 !important;
+}
+
+/* ── Responsive chat input — always visible on mobile ── */
+@media (max-width: 600px) {
+  .chat-input-wrap {
+    padding: .5rem .75rem .75rem;
+  }
+  .chat-input {
+    font-size: .875rem;
+  }
+  .chat-input-hint {
+    display: none;
+  }
+  /* Make messages fill width better */
+  .msg-row { padding: 0 .75rem; }
+  .chat-welcome { padding: 1.5rem .75rem 1rem; }
+  /* Members panel full width on mobile */
+  .members-panel {
+    width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    top: auto !important;
+    height: 60vh;
+  }
+}
+
+/* ── Smooth tap targets for mobile ── */
+@media (max-width: 768px) {
+  .ma-btn { padding: .3rem .4rem; font-size: .85rem; }
+  .jump-btn { bottom: 5rem; font-size: .78rem; }
+}

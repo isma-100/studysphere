@@ -342,6 +342,21 @@ export default function GroupChatPage(){
     setIsMember(true);await loadGroup()
   }
 
+  const isCreator = group?.creator_id === user?.id
+
+  async function handleLeaveGroup(){
+    if(!window.confirm('Leave this group? You can rejoin later.')) return
+    await supabase.from('group_members').delete().eq('group_id',id).eq('user_id',user.id)
+    navigate('/browse')
+  }
+
+  async function handleDeleteGroup(){
+    if(!window.confirm('Delete this group permanently? This cannot be undone.')) return
+    if(!window.confirm('Are you sure? All messages and data will be lost.')) return
+    await supabase.from('groups').delete().eq('id',id)
+    navigate('/browse')
+  }
+
   function dname(u){return u?.full_name||u?.email?.split('@')[0]||'Unknown'}
 
   function renderAtt(msg){
@@ -451,11 +466,24 @@ export default function GroupChatPage(){
             </div>
           </div>
           <div className="ch-right">
-            <Link to={`/groups/${id}/call`} className="ch-icon-btn ch-call-btn" title="Start video call">📹 Call</Link>
+            <Link to={`/groups/${id}/call`} className="ch-icon-btn ch-call-btn" title="Start video call">📹 <span className="btn-label">Call</span></Link>
             <button className={`ch-icon-btn${showScheduler?' active':''}`} onClick={()=>setShowScheduler(v=>!v)} title="Sessions">📅</button>
-            <button className={`ch-icon-btn${searchOpen?' active':''}`} onClick={()=>setSearchOpen(v=>!v)} title="Search">🔍</button>
-            <button className={`ch-icon-btn${showMembers?' active':''}`} onClick={()=>setShowMembers(v=>!v)} title="Members">👥 {mc}</button>
+            <button className={`ch-icon-btn ch-hide-sm${searchOpen?' active':''}`} onClick={()=>setSearchOpen(v=>!v)} title="Search">🔍</button>
+            <button className={`ch-icon-btn${showMembers?' active':''}`} onClick={()=>setShowMembers(v=>!v)} title="Members">👥 <span className="btn-label">{mc}</span></button>
             <AIAssistant groupId={id} groupName={group.name} subject={subject?.name} recentMessages={messages.slice(-20).map(m=>({content:m.content,sender_name:m.users?.full_name}))} />
+            {/* ⋯ More menu — leave / delete */}
+            <div className="ch-more-wrap">
+              <button className="ch-icon-btn ch-more-btn" title="More options">⋯</button>
+              <div className="ch-more-menu">
+                <button className="ch-more-item" onClick={()=>setSearchOpen(v=>!v)}>🔍 Search messages</button>
+                {isMember && !isCreator && (
+                  <button className="ch-more-item ch-more-danger" onClick={handleLeaveGroup}>🚪 Leave group</button>
+                )}
+                {isCreator && (
+                  <button className="ch-more-item ch-more-danger" onClick={handleDeleteGroup}>🗑️ Delete group</button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
