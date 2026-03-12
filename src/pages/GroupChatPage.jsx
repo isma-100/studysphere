@@ -123,15 +123,32 @@ Student's question: ${command.rest || 'Can you help us study?'}
 Answer helpfully and concisely. Use emojis sparingly. If relevant, mention what they should look up or practice next. Max 3 paragraphs.`
   }
 
+  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
+  if (!apiKey) {
+    return '⚠️ AI is not configured. Add VITE_ANTHROPIC_API_KEY to your .env file to enable the AI tutor.'
+  }
+
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
       messages: [{ role: 'user', content: prompt }]
     })
   })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    console.error('AI API error:', err)
+    return `⚠️ AI error (${res.status}): ${err?.error?.message || 'Please try again.'}`
+  }
+
   const data = await res.json()
   return data.content?.[0]?.text || 'Sorry, I could not generate a response.'
 }
