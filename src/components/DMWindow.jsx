@@ -1,10 +1,12 @@
 // src/components/DMWindow.jsx
-// Floating DM chat window — always reads live data from DMContext
-// so messages appear instantly without needing to close/reopen
+// Floating DM chat window
+// — reads live data from DMContext (instant optimistic updates)
+// — also subscribes to its own Supabase channel so BOTH sides get real-time delivery
 
 import { useEffect, useRef, useState } from 'react'
 import { useDM } from '../context/DMContext'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../supabaseClient'
 import './DMWindow.css'
 
 const GRADIENTS = [
@@ -12,61 +14,94 @@ const GRADIENTS = [
   ['#10b981','#4a7cf7'],['#f43f5e','#8b5cf6'],['#00d4c8','#10b981'],
 ]
 function avatarGrad(id='') {
-  const n = id.split('').reduce((a,c) => a+c.charCodeAt(0), 0)
+  const n = id.split('').reduce((a,c)=>a+c.charCodeAt(0),0)
   const [a,b] = GRADIENTS[n % GRADIENTS.length]
   return `linear-gradient(135deg,${a},${b})`
 }
 function initials(name='') { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()||'?' }
-function dname(u) { return u?.full_name || u?.email?.split('@')[0] || 'Unknown' }
+function dname(u) { return u?.full_name||u?.email?.split('@')[0]||'Unknown' }
 function fmtTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) }
 
 export default function DMWindow({ conv: initialConv, onClose }) {
-  // ── KEY FIX: read live conversation from context, not from the stale prop ──
-  // initialConv gives us channelId + otherUser to identify the conversation.
-  // After that we always read messages from `conversations[channelId]` so any
-  // optimistic update or incoming realtime message appears immediately.
   const { conversations, sendDM, openConversation } = useDM()
   const { user } = useAuth()
-  const [input, setInput] = useState('')
+  const [input, setInput]   = useState('')
   const bottomRef = useRef(null)
   const inputRef  = useRef(null)
+  const subRef    = useRef(null)
 
   const channelId = initialConv?.channelId
   const otherUser = initialConv?.otherUser
 
-  // Always get the freshest version of this conversation from context
-  const liveConv = conversations[channelId] || initialConv || { messages: [] }
-  const messages = liveConv.messages || []
+  // Always read the freshest messages from context
+  const liveConv  = conversations[channelId] || initialConv || { messages:[] }
+  const messages  = liveConv.messages || []
 
-  // Mark conversation as open (clears unread) and focus input
   useEffect(() => {
-    if (channelId) openConversation(channelId)
+    if (!channelId) return
+    openConversation(channelId)
+    subscribeToChannel()
     setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+      bottomRef.current?.scrollIntoView({ behavior:'instant' })
       inputRef.current?.focus()
     }, 50)
+    return () => subRef.current?.unsubscribe()
   }, [channelId])
 
-  // Auto-scroll to bottom whenever a new message arrives
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    bottomRef.current?.scrollIntoView({ behavior:'smooth' })
   }, [messages.length])
+
+  // Subscribe to ALL messages in this channel (both directions)
+  // This means the sender also sees their own message confirmed in real-time
+  // and the receiver gets it instantly even if DMContext inbox missed it
+  function subscribeToChannel() {
+    subRef.current?.unsubscribe()
+    subRef.current = supabase
+      .channel(`dm-window-${channelId}`)
+      .on('postgres_changes', {
+        event:  'INSERT',
+        schema: 'public',
+        table:  'direct_messages',
+        filter: `channel_id=eq.${channelId}`,
+      }, async (payload) => {
+        const msg = payload.new
+        // Skip if it's our own message — already handled optimistically
+        if (msg.sender_id === user.id) return
+
+        // Fetch sender info for the incoming message
+        const { data: sender } = await supabase
+          .from('users').select('id,full_name,email').eq('id', msg.sender_id).single()
+
+        const enriched = { ...msg, sender }
+
+        // Inject into the conversation in DMContext
+        openConversation(channelId) // mark as read since window is open
+        // We use a custom event to push the message into DMContext
+        // since we can't call setConversations directly here
+        window.dispatchEvent(new CustomEvent('dm-incoming', {
+          detail: { channelId, message: enriched, otherUser: sender }
+        }))
+      })
+      .subscribe()
+  }
 
   async function handleSend() {
     if (!input.trim()) return
     const text = input
-    setInput('') // clear immediately so it feels instant
+    setInput('')
     await sendDM(channelId, otherUser?.id, text)
   }
 
   function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
+    if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
   return (
     <div className="dmw-root">
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="dmw-header">
         <div className="dmw-av" style={{ background: avatarGrad(otherUser?.id||'') }}>
           {initials(dname(otherUser))}
@@ -78,25 +113,25 @@ export default function DMWindow({ conv: initialConv, onClose }) {
         <button className="dmw-close" onClick={onClose} title="Close">✕</button>
       </div>
 
-      {/* ── Messages ── */}
+      {/* Messages */}
       <div className="dmw-messages">
         {messages.length === 0 && (
           <div className="dmw-empty">Start the conversation! 👋</div>
         )}
         {messages.map((msg, i) => {
-          const isMe = msg.sender_id === user.id
-          const prev = messages[i - 1]
+          const isMe   = msg.sender_id === user.id
+          const prev   = messages[i-1]
           const showAv = !isMe && (!prev || prev.sender_id !== msg.sender_id)
           const isTemp = String(msg.id).startsWith('temp-')
           return (
-            <div key={msg.id} className={`dmw-msg${isMe ? ' me' : ''}${isTemp ? ' sending' : ''}`}>
+            <div key={msg.id} className={`dmw-msg${isMe?' me':''}${isTemp?' sending':''}`}>
               {!isMe && (
                 <div className="dmw-msg-av-col">
                   {showAv
                     ? <div className="dmw-msg-av" style={{ background: avatarGrad(msg.sender_id) }}>
                         {initials(dname(msg.sender))}
                       </div>
-                    : <div className="dmw-msg-av-space" />
+                    : <div className="dmw-msg-av-space"/>
                   }
                 </div>
               )}
@@ -110,10 +145,10 @@ export default function DMWindow({ conv: initialConv, onClose }) {
             </div>
           )
         })}
-        <div ref={bottomRef} />
+        <div ref={bottomRef}/>
       </div>
 
-      {/* ── Input ── */}
+      {/* Input */}
       <div className="dmw-input-row">
         <input
           ref={inputRef}
@@ -125,7 +160,7 @@ export default function DMWindow({ conv: initialConv, onClose }) {
           maxLength={2000}
         />
         <button
-          className={`dmw-send${input.trim() ? ' ready' : ''}`}
+          className={`dmw-send${input.trim()?' ready':''}`}
           onClick={handleSend}
           disabled={!input.trim()}
         >↑</button>

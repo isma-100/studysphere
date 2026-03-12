@@ -57,9 +57,13 @@ export default function SignUpPage() {
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
     setLoading(true); setApiError('')
+    const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin
     const { error } = await supabase.auth.signUp({
       email: form.email, password: form.password,
-      options: { data: { full_name: form.fullName } }
+      options: {
+        data: { full_name: form.fullName },
+        emailRedirectTo: `${siteUrl}/auth/callback`,
+      }
     })
     setLoading(false)
     if (error) setApiError(error.message)
