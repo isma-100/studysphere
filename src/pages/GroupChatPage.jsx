@@ -429,6 +429,7 @@ export default function GroupChatPage(){
   const mc=members.length
 
   return(
+    <>
     <AppLayout>
       <div className="chat-shell">
 
@@ -683,5 +684,6 @@ export default function GroupChatPage(){
         onClose={() => setDmTarget(null)}
       />
     )}
+  </>
   )
 }
