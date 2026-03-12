@@ -1,5 +1,4 @@
 // src/components/SessionScheduler.jsx
-// Shows upcoming sessions + create form inside group chat
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
@@ -8,7 +7,6 @@ import './SessionScheduler.css'
 function fmtDate(ts) {
   const d = new Date(ts)
   const now = new Date()
-  const diff = d - now
   const isToday = d.toDateString() === now.toDateString()
   const isTomorrow = d.toDateString() === new Date(now.getTime()+86400000).toDateString()
   const time = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
@@ -19,19 +17,20 @@ function fmtDate(ts) {
 
 function timeUntil(ts) {
   const diff = new Date(ts) - Date.now()
-  if (diff < 0)           return 'started'
-  if (diff < 3600000)     return `in ${Math.floor(diff/60000)}m`
-  if (diff < 86400000)    return `in ${Math.floor(diff/3600000)}h`
+  if (diff < 0)            return 'started'
+  if (diff < 3600000)      return `in ${Math.floor(diff/60000)}m`
+  if (diff < 86400000)     return `in ${Math.floor(diff/3600000)}h`
   return `in ${Math.floor(diff/86400000)}d`
 }
 
 export default function SessionScheduler({ groupId }) {
   const { user } = useAuth()
-  const [sessions,  setSessions]  = useState([])
-  const [showForm,  setShowForm]  = useState(false)
-  const [loading,   setLoading]   = useState(false)
-  const [saving,    setSaving]    = useState(false)
-  const [rsvps,     setRsvps]     = useState({}) // sessionId → status
+  const [sessions,   setSessions]   = useState([])
+  const [showForm,   setShowForm]   = useState(false)
+  const [loading,    setLoading]    = useState(false)
+  const [saving,     setSaving]     = useState(false)
+  const [saveError,  setSaveError]  = useState('')
+  const [rsvps,      setRsvps]      = useState({})
   const [form, setForm] = useState({
     title:'', description:'', start_time:'', end_time:'', location:'online'
   })
@@ -40,17 +39,20 @@ export default function SessionScheduler({ groupId }) {
 
   async function loadSessions() {
     setLoading(true)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('sessions')
       .select(`*, users(full_name,email), session_rsvps(user_id,status)`)
       .eq('group_id', groupId)
-      .gte('start_time', new Date(Date.now() - 3600000).toISOString()) // include just-started
+      .gte('start_time', new Date(Date.now() - 3600000).toISOString())
       .order('start_time', { ascending: true })
       .limit(10)
 
-    if (data) {
+    if (error) {
+      // Table might not exist yet — fail silently, just show empty
+      console.warn('Sessions load error:', error.message)
+      setSessions([])
+    } else if (data) {
       setSessions(data)
-      // Build my RSVP map
       const myRsvps = {}
       data.forEach(s => {
         const mine = s.session_rsvps?.find(r => r.user_id === user.id)
@@ -64,34 +66,50 @@ export default function SessionScheduler({ groupId }) {
   async function handleCreate() {
     if (!form.title.trim() || !form.start_time) return
     setSaving(true)
+    setSaveError('')
+
     const { data, error } = await supabase.from('sessions').insert({
-      group_id:   groupId,
-      creator_id: user.id,
-      title:      form.title.trim(),
-      description:form.description.trim() || null,
-      start_time: new Date(form.start_time).toISOString(),
-      end_time:   form.end_time ? new Date(form.end_time).toISOString() : null,
-      location:   form.location.trim() || 'online',
+      group_id:    groupId,
+      creator_id:  user.id,
+      title:       form.title.trim(),
+      description: form.description.trim() || null,
+      start_time:  new Date(form.start_time).toISOString(),
+      end_time:    form.end_time ? new Date(form.end_time).toISOString() : null,
+      location:    form.location.trim() || 'online',
     }).select().single()
 
+    if (error) {
+      console.error('Session create error:', error)
+      if (error.code === '42P01') {
+        setSaveError('⚠️ Sessions table is missing. Please run phase7.sql in Supabase SQL Editor first.')
+      } else if (error.code === '42501') {
+        setSaveError('⚠️ Permission denied. Make sure you are a member of this group.')
+      } else {
+        setSaveError(`⚠️ Could not create session: ${error.message}`)
+      }
+      setSaving(false)
+      return
+    }
+
     if (data) {
-      // Auto-RSVP creator as going
-      await supabase.from('session_rsvps').insert({ session_id:data.id, user_id:user.id, status:'going' })
-      // Schedule browser notification
+      await supabase.from('session_rsvps').insert({
+        session_id: data.id, user_id: user.id, status: 'going'
+      })
       scheduleNotification(data)
       setForm({ title:'', description:'', start_time:'', end_time:'', location:'online' })
       setShowForm(false)
+      setSaveError('')
       await loadSessions()
     }
     setSaving(false)
   }
 
   async function handleRsvp(sessionId, status) {
-    const prev = rsvps[sessionId]
     setRsvps(r => ({ ...r, [sessionId]: status }))
-    await supabase.from('session_rsvps').upsert({
-      session_id: sessionId, user_id: user.id, status
-    }, { onConflict: 'session_id,user_id' })
+    await supabase.from('session_rsvps').upsert(
+      { session_id: sessionId, user_id: user.id, status },
+      { onConflict: 'session_id,user_id' }
+    )
     await loadSessions()
   }
 
@@ -104,11 +122,11 @@ export default function SessionScheduler({ groupId }) {
     if (!('Notification' in window)) return
     Notification.requestPermission().then(perm => {
       if (perm !== 'granted') return
-      const msUntil = new Date(session.start_time) - Date.now() - 300000 // 5min before
+      const msUntil = new Date(session.start_time) - Date.now() - 300000
       if (msUntil > 0 && msUntil < 86400000) {
         setTimeout(() => {
           new Notification(`⏰ Starting in 5 min: ${session.title}`, {
-            body: `Your study session is about to begin!`,
+            body: 'Your study session is about to begin!',
             icon: '/favicon.svg'
           })
         }, msUntil)
@@ -116,7 +134,7 @@ export default function SessionScheduler({ groupId }) {
     })
   }
 
-  const goingCount = (s) => s.session_rsvps?.filter(r=>r.status==='going').length || 0
+  const goingCount = (s) => s.session_rsvps?.filter(r => r.status === 'going').length || 0
 
   return (
     <div className="sched-wrap">
@@ -125,7 +143,7 @@ export default function SessionScheduler({ groupId }) {
           <span>📅</span> Upcoming Sessions
           {sessions.length > 0 && <span className="sched-badge">{sessions.length}</span>}
         </div>
-        <button className="sched-add-btn" onClick={() => setShowForm(f=>!f)}>
+        <button className="sched-add-btn" onClick={() => { setShowForm(f=>!f); setSaveError('') }}>
           {showForm ? '✕ Cancel' : '＋ Schedule'}
         </button>
       </div>
@@ -133,6 +151,9 @@ export default function SessionScheduler({ groupId }) {
       {/* Create form */}
       {showForm && (
         <div className="sched-form">
+          {saveError && (
+            <div className="sched-error">{saveError}</div>
+          )}
           <input className="sched-input" placeholder="Session title *"
             value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} maxLength={80}/>
           <textarea className="sched-input sched-textarea" placeholder="What will you cover? (optional)"
@@ -145,7 +166,7 @@ export default function SessionScheduler({ groupId }) {
                 min={new Date().toISOString().slice(0,16)}/>
             </div>
             <div className="sched-field">
-              <label className="sched-label">End time</label>
+              <label className="sched-label">End time (optional)</label>
               <input type="datetime-local" className="sched-input"
                 value={form.end_time} onChange={e=>setForm(f=>({...f,end_time:e.target.value}))}/>
             </div>
@@ -153,8 +174,8 @@ export default function SessionScheduler({ groupId }) {
           <input className="sched-input" placeholder="Location (default: online)"
             value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))}/>
           <button className="sched-create-btn" onClick={handleCreate}
-            disabled={saving||!form.title.trim()||!form.start_time}>
-            {saving ? 'Creating…' : '📅 Create Session'}
+            disabled={saving || !form.title.trim() || !form.start_time}>
+            {saving ? '⏳ Creating…' : '📅 Create Session'}
           </button>
         </div>
       )}
@@ -193,12 +214,16 @@ export default function SessionScheduler({ groupId }) {
                 <div className="si-right">
                   {!isPast && (
                     <div className="si-rsvp-btns">
-                      {['going','maybe','not_going'].map(status => (
+                      {[
+                        { status:'going',     label:'✓', title:'Going'    },
+                        { status:'maybe',     label:'?', title:'Maybe'    },
+                        { status:'not_going', label:'✗', title:"Can't go" },
+                      ].map(({ status, label, title }) => (
                         <button key={status}
-                          className={`si-rsvp${myRsvp===status?' active':''}`}
+                          className={`si-rsvp${myRsvp===status?' si-rsvp-'+status:''}`}
                           onClick={() => handleRsvp(s.id, status)}
-                          title={status==='not_going'?"Can't go":status.charAt(0).toUpperCase()+status.slice(1)}>
-                          {status==='going'?'✓':status==='maybe'?'?':'✗'}
+                          title={title}>
+                          {label}
                         </button>
                       ))}
                     </div>
