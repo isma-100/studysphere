@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>StudySphere — See How It Works</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,200,.4)}70%{box-shadow:0 0 0 10px rgba(0,212,200,0)}}
+
+:root{
+  --midnight:#0a0f1e;--teal:#00d4c8;--teal2:#00b5aa;
+  --blue:#4a7cf7;--violet:#8b5cf6;--amber:#f59e0b;
+  --green:#10b981;--rose:#f43f5e;
+  --font:'Plus Jakarta Sans',sans-serif;
+}
+
+body{
+  font-family:var(--font);
+  background:var(--midnight);
+  color:white;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2rem;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.topbar-logo{font-size:1.1rem;font-weight:800;display:flex;align-items:center;gap:.5rem;}
+.topbar-logo em{font-style:normal;color:var(--teal);}
+.topbar-badge{
+  background:rgba(0,212,200,.12);border:1px solid rgba(0,212,200,.3);
+  border-radius:100px;padding:.3rem .9rem;
+  font-size:.72rem;font-weight:700;color:var(--teal);
+  letter-spacing:.05em;text-transform:uppercase;
+}
+.topbar-cta{
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border-radius:100px;padding:.45rem 1.2rem;
+  font-size:.8rem;font-weight:800;color:white;
+  text-decoration:none;box-shadow:0 4px 16px rgba(0,212,200,.3);
+  transition:all .2s;
+}
+.topbar-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,212,200,.4);}
+
+/* ── HERO ── */
+.hero{
+  text-align:center;padding:3.5rem 1.5rem 2.5rem;
+  max-width:700px;margin:0 auto;
+}
+.hero-label{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(0,212,200,.1);border:1px solid rgba(0,212,200,.25);
+  border-radius:100px;padding:.35rem 1rem;
+  font-size:.72rem;font-weight:700;color:var(--teal);
+  margin-bottom:1.25rem;letter-spacing:.04em;
+}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+.hero h1{
+  font-size:clamp(1.8rem,5vw,3rem);font-weight:800;
+  letter-spacing:-.04em;line-height:1.15;margin-bottom:1rem;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.5);line-height:1.7;max-width:500px;margin:0 auto 2rem;}
+
+/* ── SCENE NAVIGATION ── */
+.nav-scenes{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:.5rem;
+  padding:.75rem 1.5rem 1.5rem;
+}
+.nav-scene-btn{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.4rem .9rem;border-radius:100px;
+  border:1.5px solid rgba(255,255,255,.1);
+  background:transparent;color:rgba(255,255,255,.45);
+  font-size:.72rem;font-weight:700;cursor:pointer;
+  font-family:var(--font);transition:all .2s;
+}
+.nav-scene-btn:hover{border-color:rgba(255,255,255,.3);color:white;}
+.nav-scene-btn.active{
+  background:rgba(0,212,200,.12);border-color:rgba(0,212,200,.5);color:var(--teal);
+}
+
+/* ── STAGE ── */
+.stage-wrap{
+  max-width:900px;margin:0 auto;
+  padding:0 1.5rem 3rem;
+  position:relative;
+}
+.stage{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;overflow:hidden;
+  min-height:480px;position:relative;
+}
+
+/* Scene progress */
+.scene-progress{height:3px;background:rgba(255,255,255,.06);}
+.scene-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--teal),var(--blue));
+  transition:width .05s linear;
+}
+
+/* ── AUTOPLAY INDICATOR ── */
+.autoplay-bar{
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+  padding:.65rem;background:rgba(255,255,255,.03);
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.ap-dots{display:flex;gap:.35rem;}
+.ap-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,.15);cursor:pointer;transition:.2s;border:none;
+}
+.ap-dot.active{background:var(--teal);box-shadow:0 0 6px var(--teal);}
+.ap-dot.done{background:rgba(0,212,200,.4);}
+.ap-label{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.35);}
+
+/* ── SCENES ── */
+.scene{
+  width:100%;min-height:477px;
+  display:none;flex-direction:column;
+  animation:fadeIn .35s ease both;
+}
+.scene.active{display:flex;}
+
+/* LAPTOP + MOBILE side-by-side wrapper */
+.dual-view{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;
+}
+.device-laptop{
+  width:380px;background:#1a2035;border-radius:12px;
+  border:1px solid rgba(255,255,255,.1);overflow:hidden;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);flex-shrink:0;
+  animation:slideUp .4s ease both;
+}
+.laptop-bar{
+  display:flex;align-items:center;gap:.4rem;
+  background:#141928;padding:.5rem .75rem;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.lb-dot{width:8px;height:8px;border-radius:50%;}
+.lb-url{flex:1;background:rgba(255,255,255,.06);border-radius:4px;
+  padding:.2rem .6rem;font-size:.6rem;color:rgba(255,255,255,.3);margin:0 .5rem;}
+.device-mobile{
+  width:180px;background:#1a2035;border-radius:20px;
+  border:1px solid rgba(255,255,255,.12);overflow:hidden;
+  box-shadow:0 16px 40px rgba(0,0,0,.5);flex-shrink:0;
+  animation:slideUp .4s .1s ease both;
+}
+.mobile-notch{
+  height:24px;background:#141928;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.mn-pill{width:50px;height:8px;background:rgba(255,255,255,.15);border-radius:4px;}
+
+/* Scene label */
+.scene-label-row{
+  display:flex;align-items:center;gap:.75rem;
+  padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.sl-num{
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:800;color:white;flex-shrink:0;
+}
+.sl-text{font-size:.9rem;font-weight:800;color:white;}
+.sl-sub{font-size:.72rem;color:rgba(255,255,255,.4);}
+
+/* Cursor */
+.cursor{animation:blink .8s steps(1) infinite;color:var(--teal);}
+
+/* ── SIGNUP SCENE ── */
+.lp-auth{padding:1.25rem;display:flex;flex-direction:column;gap:.7rem;}
+.la-brand{font-size:.85rem;font-weight:800;text-align:center;margin-bottom:.25rem;}
+.la-brand em{font-style:normal;color:var(--teal);}
+.la-title{font-size:.9rem;font-weight:800;text-align:center;color:white;}
+.la-field{display:flex;flex-direction:column;gap:.2rem;}
+.la-label{font-size:.6rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em;}
+.la-inp{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:7px;padding:.45rem .65rem;
+  font-size:.75rem;color:rgba(255,255,255,.8);min-height:28px;
+}
+.la-inp.active{border-color:rgba(0,212,200,.5);background:rgba(0,212,200,.06);}
+.la-inp.filled{color:rgba(255,255,255,.9);}
+.la-btn{
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border-radius:8px;padding:.55rem;text-align:center;
+  font-size:.78rem;font-weight:800;color:white;margin-top:.1rem;
+  box-shadow:0 4px 14px rgba(0,212,200,.35);
+}
+.la-note{font-size:.6rem;color:rgba(255,255,255,.3);text-align:center;}
+.la-note span{color:var(--teal);}
+
+/* ── DASHBOARD SCENE ── */
+.lp-dash{padding:1rem;display:flex;flex-direction:column;gap:.65rem;}
+.ld-welcome{font-size:.85rem;font-weight:800;color:white;}
+.ld-welcome span{color:var(--teal);}
+.ld-stats{display:flex;gap:.5rem;}
+.ld-stat{flex:1;background:rgba(255,255,255,.06);border-radius:8px;padding:.5rem;text-align:center;}
+.ld-stat-n{font-size:1rem;font-weight:800;color:white;}
+.ld-stat-l{font-size:.58rem;color:rgba(255,255,255,.4);}
+.ld-groups{display:flex;flex-direction:column;gap:.4rem;}
+.ld-g-title{font-size:.65rem;font-weight:800;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em;}
+.ld-group{display:flex;align-items:center;gap:.6rem;background:rgba(255,255,255,.05);border-radius:8px;padding:.45rem .6rem;}
+.ld-group-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;}
+.ld-group-name{font-size:.75rem;font-weight:700;color:white;flex:1;}
+.ld-online{font-size:.6rem;font-weight:700;color:var(--teal);}
+
+/* ── CHAT SCENE ── */
+.lp-chat{display:flex;flex-direction:column;height:100%;}
+.lc-header{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08);}
+.lc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.lc-name{font-size:.8rem;font-weight:800;color:white;flex:1;}
+.lc-meta{font-size:.6rem;color:rgba(255,255,255,.35);}
+.lc-msgs{flex:1;padding:.6rem .75rem;display:flex;flex-direction:column;gap:.5rem;overflow:hidden;}
+.lc-msg{display:flex;gap:.4rem;align-items:flex-end;}
+.lc-msg.me{flex-direction:row-reverse;}
+.lc-av{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:white;}
+.lc-bubble{background:rgba(255,255,255,.09);border-radius:0 8px 8px 8px;padding:.4rem .6rem;font-size:.72rem;color:rgba(255,255,255,.85);line-height:1.4;max-width:200px;}
+.lc-bubble.me{background:linear-gradient(135deg,rgba(0,212,200,.3),rgba(74,124,247,.3));border-radius:8px 0 8px 8px;}
+.lc-ai{background:rgba(0,212,200,.08);border:1px solid rgba(0,212,200,.2);border-radius:8px;padding:.4rem .6rem;margin-top:.1rem;}
+.lc-ai-lbl{font-size:.55rem;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;}
+.lc-ai-txt{font-size:.68rem;color:rgba(255,255,255,.7);line-height:1.4;}
+.lc-input{display:flex;align-items:center;gap:.4rem;padding:.45rem .65rem;background:rgba(255,255,255,.05);border-top:1px solid rgba(255,255,255,.08);}
+.lc-inp-txt{flex:1;font-size:.7rem;color:rgba(255,255,255,.4);background:rgba(255,255,255,.06);border-radius:6px;padding:.3rem .55rem;}
+.lc-send{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:white;flex-shrink:0;}
+
+/* ── MOBILE VIEWS ── */
+.mob-chat{display:flex;flex-direction:column;height:220px;}
+.mob-header{display:flex;align-items:center;gap:.35rem;padding:.45rem .6rem;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08);}
+.mob-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+.mob-name{font-size:.7rem;font-weight:800;color:white;flex:1;}
+.mob-call{font-size:.6rem;font-weight:700;color:white;background:rgba(0,212,200,.2);border-radius:5px;padding:.15rem .4rem;}
+.mob-msgs{flex:1;padding:.5rem .6rem;display:flex;flex-direction:column;gap:.4rem;overflow:hidden;}
+.mob-msg{display:flex;gap:.3rem;align-items:flex-end;}
+.mob-msg.me{flex-direction:row-reverse;}
+.mob-av{width:18px;height:18px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:800;color:white;}
+.mob-bub{background:rgba(255,255,255,.09);border-radius:0 6px 6px 6px;padding:.3rem .5rem;font-size:.62rem;color:rgba(255,255,255,.8);line-height:1.35;max-width:120px;}
+.mob-bub.me{background:linear-gradient(135deg,rgba(0,212,200,.3),rgba(74,124,247,.3));border-radius:6px 0 6px 6px;}
+.mob-input{display:flex;align-items:center;gap:.3rem;padding:.4rem .6rem;background:rgba(255,255,255,.05);border-top:1px solid rgba(255,255,255,.08);}
+.mob-inp{flex:1;background:rgba(255,255,255,.07);border-radius:5px;padding:.25rem .45rem;font-size:.6rem;color:rgba(255,255,255,.4);}
+.mob-snd{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:white;flex-shrink:0;}
+
+/* ── SESSION SCENE ── */
+.lp-session{padding:1rem;display:flex;flex-direction:column;gap:.6rem;}
+.ls-title{font-size:.78rem;font-weight:800;color:white;display:flex;align-items:center;gap:.4rem;}
+.ls-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.7rem .85rem;display:flex;flex-direction:column;gap:.4rem;}
+.ls-card.highlight{border-color:rgba(0,212,200,.4);background:rgba(0,212,200,.06);}
+.ls-badge{display:inline-flex;font-size:.6rem;font-weight:700;padding:.15rem .5rem;border-radius:100px;width:fit-content;}
+.ls-badge.today{background:rgba(0,212,200,.15);color:var(--teal);}
+.ls-badge.soon{background:rgba(74,124,247,.15);color:var(--blue);}
+.ls-card-name{font-size:.8rem;font-weight:800;color:white;}
+.ls-card-meta{font-size:.62rem;color:rgba(255,255,255,.4);}
+.ls-rsvp{display:flex;gap:.3rem;margin-top:.1rem;}
+.ls-rv{font-size:.6rem;font-weight:700;padding:.2rem .5rem;border-radius:6px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+.ls-rv.active{background:rgba(0,212,200,.15);color:var(--teal);}
+
+/* ── DM SCENE ── */
+.lp-dm{display:flex;height:100%;}
+.dm-list{width:130px;flex-shrink:0;border-right:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;}
+.dm-list-title{font-size:.6rem;font-weight:800;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;padding:.6rem .7rem .3rem;}
+.dm-item{display:flex;align-items:center;gap:.4rem;padding:.45rem .7rem;cursor:pointer;}
+.dm-item.active{background:rgba(255,255,255,.05);}
+.dm-item-av{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:white;}
+.dm-item-info{flex:1;overflow:hidden;}
+.dm-item-name{font-size:.68rem;font-weight:700;color:white;}
+.dm-item-last{font-size:.58rem;color:rgba(255,255,255,.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dm-badge{background:var(--rose);color:white;font-size:.55rem;font-weight:800;border-radius:100px;padding:.05rem .3rem;flex-shrink:0;}
+.dm-window{flex:1;display:flex;flex-direction:column;}
+.dmw-hdr{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);}
+.dmw-hav{width:20px;height:20px;border-radius:5px;background:var(--teal2);display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:800;color:white;}
+.dmw-hname{font-size:.75rem;font-weight:800;color:white;}
+.dmw-msgs{flex:1;padding:.6rem .7rem;display:flex;flex-direction:column;gap:.4rem;}
+.dmw-m{display:flex;}.dmw-m.me{justify-content:flex-end;}
+.dmw-bub{background:rgba(255,255,255,.08);border-radius:7px;padding:.3rem .55rem;font-size:.68rem;color:rgba(255,255,255,.8);max-width:160px;line-height:1.35;}
+.dmw-bub.me{background:linear-gradient(135deg,rgba(0,212,200,.25),rgba(74,124,247,.25));color:white;}
+
+/* ── FEATURES GRID ── */
+.features-section{max-width:900px;margin:0 auto;padding:0 1.5rem 4rem;}
+.fs-title{text-align:center;font-size:1.4rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem;}
+.fs-sub{text-align:center;color:rgba(255,255,255,.4);font-size:.875rem;margin-bottom:2rem;}
+.fs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.9rem;}
+.fs-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;padding:1.1rem 1.1rem .9rem;
+  transition:all .2s;
+}
+.fs-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);transform:translateY(-2px);}
+.fs-icon{font-size:1.5rem;margin-bottom:.6rem;}
+.fs-name{font-size:.85rem;font-weight:800;color:white;margin-bottom:.25rem;}
+.fs-desc{font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.5;}
+
+/* ── CTA ── */
+.cta-section{text-align:center;padding:2rem 1.5rem 4rem;}
+.cta-title{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.75rem;}
+.cta-title span{color:var(--teal);}
+.cta-sub{color:rgba(255,255,255,.45);font-size:.9rem;margin-bottom:1.75rem;}
+.cta-btn{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border-radius:100px;padding:.85rem 2.5rem;
+  font-size:1rem;font-weight:800;color:white;text-decoration:none;
+  box-shadow:0 8px 32px rgba(0,212,200,.35);
+  transition:all .25s;animation:float 3s ease-in-out infinite;
+}
+.cta-btn:hover{transform:translateY(-3px)!important;box-shadow:0 16px 48px rgba(0,212,200,.45);}
+.cta-note{font-size:.75rem;color:rgba(255,255,255,.3);margin-top:.75rem;}
+
+/* Background orbs */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:-1;}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,200,.08) 0%,transparent 70%);top:-100px;left:-100px;}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(74,124,247,.07) 0%,transparent 70%);bottom:-80px;right:-80px;}
+
+@media(max-width:600px){
+  .topbar{padding:.75rem 1rem;}
+  .hero{padding:2.5rem 1rem 2rem;}
+  .dual-view{padding:1.25rem 1rem;gap:1rem;}
+  .device-laptop{width:100%;max-width:360px;}
+  .device-mobile{display:none;}
+  .fs-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">🌐 Study<em>Sphere</em></div>
+  <div class="topbar-badge">✦ Free Demo</div>
+  <a class="topbar-cta" href="https://studysphere-git-main-binslim10-9276s-projects.vercel.app" target="_blank">
+    Join Free →
+  </a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label"><div class="hero-dot"></div>See exactly how it works</div>
+  <h1>Study smarter,<br/><span>together.</span></h1>
+  <p class="hero-sub">StudySphere connects students and self-learners worldwide. Real-time chat, video calls, AI tutoring — all free, no download needed.</p>
+</div>
+
+<!-- SCENE NAVIGATION -->
+<div class="nav-scenes" id="navScenes"></div>
+
+<!-- STAGE -->
+<div class="stage-wrap">
+  <div class="stage">
+    <div class="scene-progress"><div class="scene-progress-fill" id="progressFill"></div></div>
+    <div id="stageContent"></div>
+    <div class="autoplay-bar">
+      <div class="ap-dots" id="apDots"></div>
+      <div class="ap-label" id="apLabel">Auto-playing demo</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features-section">
+  <div class="fs-title">Everything your study group needs</div>
+  <div class="fs-sub">Built for students, self-learners and knowledge sharers worldwide</div>
+  <div class="fs-grid">
+    <div class="fs-card"><div class="fs-icon">💬</div><div class="fs-name">Group Chat</div><div class="fs-desc">Real-time messaging with file sharing, reactions, and message search</div></div>
+    <div class="fs-card"><div class="fs-icon">📹</div><div class="fs-name">Video Calls</div><div class="fs-desc">HD video with screen sharing, raise hand, and in-call chat</div></div>
+    <div class="fs-card"><div class="fs-icon">🤖</div><div class="fs-name">AI Tutor</div><div class="fs-desc">Type @ai in any group chat to get instant explanations and quizzes</div></div>
+    <div class="fs-card"><div class="fs-icon">📅</div><div class="fs-name">Study Sessions</div><div class="fs-desc">Schedule sessions, RSVP, and get browser reminders 5 minutes before</div></div>
+    <div class="fs-card"><div class="fs-icon">💌</div><div class="fs-name">Direct Messages</div><div class="fs-desc">Private chat with any member — real-time with read receipts</div></div>
+    <div class="fs-card"><div class="fs-icon">✨</div><div class="fs-name">Smart Matching</div><div class="fs-desc">AI recommends the best groups for you based on your profile</div></div>
+    <div class="fs-card"><div class="fs-icon">📎</div><div class="fs-name">File Sharing</div><div class="fs-desc">Share images, PDFs, docs, and videos directly in the chat</div></div>
+    <div class="fs-card"><div class="fs-icon">🌍</div><div class="fs-name">Global Community</div><div class="fs-desc">Join groups across 80+ subjects — no region or college restrictions</div></div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-title">Ready to <span>study smarter?</span></div>
+  <div class="cta-sub">Join thousands of learners already using StudySphere — completely free.</div>
+  <a class="cta-btn" href="https://studysphere-git-main-binslim10-9276s-projects.vercel.app" target="_blank">
+    🌐 Join StudySphere Free
+  </a>
+  <div class="cta-note">No download · No credit card · Works on any device</div>
+</div>
+
+<script>
+const SCENES = [
+  { id:'signup',  icon:'✍️', label:'Sign Up',       dur:4000 },
+  { id:'dash',    icon:'⚡', label:'Dashboard',     dur:4500 },
+  { id:'chat',    icon:'💬', label:'Group Chat',    dur:5000 },
+  { id:'ai',      icon:'🤖', label:'AI Tutor',      dur:5000 },
+  { id:'dm',      icon:'💌', label:'Direct Message',dur:4500 },
+  { id:'session', icon:'📅', label:'Sessions',      dur:4500 },
+]
+
+let current = 0, progressTimer, typing = 0, typingTimer
+
+function renderNavScenes() {
+  const el = document.getElementById('navScenes')
+  el.innerHTML = SCENES.map((s,i) => `
+    <button class="nav-scene-btn${i===current?' active':''}" onclick="goTo(${i})">
+      ${s.icon} ${s.label}
+    </button>
+  `).join('')
+}
+
+function renderDots() {
+  const el = document.getElementById('apDots')
+  el.innerHTML = SCENES.map((s,i) => `
+    <button class="ap-dot${i===current?' active':i<current?' done':''}" onclick="goTo(${i})"></button>
+  `).join('')
+}
+
+function goTo(idx) {
+  current = idx
+  clearInterval(progressTimer)
+  clearInterval(typingTimer)
+  typing = 0
+  renderScene()
+  startProgress()
+}
+
+function renderScene() {
+  renderNavScenes()
+  renderDots()
+  const el = document.getElementById('stageContent')
+  el.innerHTML = ''
+  const div = document.createElement('div')
+  div.className = 'scene active'
+  div.innerHTML = getSceneHTML(SCENES[current].id)
+  el.appendChild(div)
+
+  // Start typing animation
+  if (['signup','chat','ai'].includes(SCENES[current].id)) {
+    typing = 0
+    clearInterval(typingTimer)
+    typingTimer = setInterval(() => {
+      typing++
+      updateTyping()
+      if (typing > 60) clearInterval(typingTimer)
+    }, 55)
+  }
+}
+
+function updateTyping() {
+  const s = SCENES[current].id
+  if (s === 'signup') {
+    const el = document.getElementById('typingName')
+    if (el) el.innerHTML = 'Ismail Said Seif'.slice(0, typing) + '<span class="cursor">|</span>'
+  }
+  if (s === 'chat') {
+    const el = document.getElementById('typingChat')
+    if (el) el.innerHTML = 'Anyone understand equilibrium? 😅'.slice(0, typing*2) + '<span class="cursor">|</span>'
+  }
+  if (s === 'ai') {
+    const el = document.getElementById('typingAI')
+    const resp = 'Chemical equilibrium is when forward and reverse reactions occur at equal rates, keeping concentrations constant over time…'
+    if (el) el.innerHTML = resp.slice(0, typing*2) + '<span class="cursor">|</span>'
+  }
+}
+
+function startProgress() {
+  const dur = SCENES[current].dur
+  const step = 50
+  let elapsed = 0
+  document.getElementById('progressFill').style.width = '0%'
+  document.getElementById('apLabel').textContent = `${SCENES[current].icon} ${SCENES[current].label}`
+  clearInterval(progressTimer)
+  progressTimer = setInterval(() => {
+    elapsed += step
+    const pct = Math.min((elapsed/dur)*100, 100)
+    document.getElementById('progressFill').style.width = pct + '%'
+    if (elapsed >= dur) {
+      clearInterval(progressTimer)
+      current = (current + 1) % SCENES.length
+      renderScene()
+      startProgress()
+    }
+  }, step)
+}
+
+function getSceneHTML(id) {
+  if (id === 'signup') return `
+    <div class="scene-label-row">
+      <div class="sl-num">01</div>
+      <div><div class="sl-text">Create your account</div><div class="sl-sub">Takes less than 2 minutes — completely free</div></div>
+    </div>
+    <div class="dual-view">
+      <div class="device-laptop">
+        <div class="laptop-bar">
+          <div class="lb-dot" style="background:#f43f5e"></div>
+          <div class="lb-dot" style="background:#f59e0b;margin-left:4px"></div>
+          <div class="lb-dot" style="background:#10b981;margin-left:4px"></div>
+          <div class="lb-url">studysphere.vercel.app/signup</div>
+        </div>
+        <div class="lp-auth">
+          <div class="la-brand">🌐 Study<em>Sphere</em></div>
+          <div class="la-title">Create your account</div>
+          <div class="la-field"><div class="la-label">Full name</div><div class="la-inp active" id="typingName"><span class="cursor">|</span></div></div>
+          <div class="la-field"><div class="la-label">Email</div><div class="la-inp filled">ismail@example.com</div></div>
+          <div class="la-field"><div class="la-label">Password</div><div class="la-inp filled">••••••••</div></div>
+          <div class="la-btn">Get started free →</div>
+          <div class="la-note">Already have an account? <span>Log in</span></div>
+        </div>
+      </div>
+      <div class="device-mobile">
+        <div class="mobile-notch"><div class="mn-pill"></div></div>
+        <div class="lp-auth" style="padding:.75rem">
+          <div class="la-brand" style="font-size:.72rem">🌐 Study<em>Sphere</em></div>
+          <div class="la-field"><div class="la-label">Email</div><div class="la-inp filled" style="font-size:.68rem">ismail@example.com</div></div>
+          <div class="la-field"><div class="la-label">Password</div><div class="la-inp filled" style="font-size:.68rem">••••••••</div></div>
+          <div class="la-btn" style="font-size:.7rem">Get started free</div>
+        </div>
+      </div>
+    </div>`
+
+  if (id === 'dash') return `
+    <div class="scene-label-row">
+      <div class="sl-num">02</div>
+      <div><div class="sl-text">Your personal dashboard</div><div class="sl-sub">See your groups, activity and upcoming sessions at a glance</div></div>
+    </div>
+    <div class="dual-view">
+      <div class="device-laptop">
+        <div class="laptop-bar">
+          <div class="lb-dot" style="background:#f43f5e"></div><div class="lb-dot" style="background:#f59e0b;margin-left:4px"></div><div class="lb-dot" style="background:#10b981;margin-left:4px"></div>
+          <div class="lb-url">studysphere.vercel.app/dashboard</div>
+        </div>
+        <div class="lp-dash">
+          <div class="ld-welcome">Welcome back, <span>Ismail 👋</span></div>
+          <div class="ld-stats">
+            <div class="ld-stat"><div class="ld-stat-n">3</div><div class="ld-stat-l">Groups</div></div>
+            <div class="ld-stat"><div class="ld-stat-n">24</div><div class="ld-stat-l">Messages</div></div>
+            <div class="ld-stat"><div class="ld-stat-n">5</div><div class="ld-stat-l">Sessions</div></div>
+          </div>
+          <div class="ld-groups">
+            <div class="ld-g-title">My Groups</div>
+            <div class="ld-group"><div class="ld-group-icon" style="background:rgba(245,158,11,.15);color:#f59e0b">⚗️</div><div class="ld-group-name">Chemistry Masters</div><div class="ld-online">🟢 4 online</div></div>
+            <div class="ld-group"><div class="ld-group-icon" style="background:rgba(74,124,247,.15);color:#4a7cf7">💻</div><div class="ld-group-name">Web Dev Wizards</div><div class="ld-online">🟢 2 online</div></div>
+            <div class="ld-group"><div class="ld-group-icon" style="background:rgba(16,185,129,.15);color:#10b981">🧬</div><div class="ld-group-name">Biology Squad</div><div class="ld-online" style="color:#8892aa">● Offline</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-mobile">
+        <div class="mobile-notch"><div class="mn-pill"></div></div>
+        <div class="lp-dash" style="padding:.65rem;gap:.45rem">
+          <div class="ld-welcome" style="font-size:.72rem">Welcome, <span>Ismail 👋</span></div>
+          <div class="ld-stats" style="gap:.35rem">
+            <div class="ld-stat" style="padding:.35rem"><div class="ld-stat-n" style="font-size:.85rem">3</div><div class="ld-stat-l">Groups</div></div>
+            <div class="ld-stat" style="padding:.35rem"><div class="ld-stat-n" style="font-size:.85rem">24</div><div class="ld-stat-l">Msgs</div></div>
+          </div>
+          <div class="ld-group" style="padding:.4rem .5rem"><div class="ld-group-icon" style="background:rgba(245,158,11,.15);color:#f59e0b;width:20px;height:20px;font-size:.65rem">⚗️</div><div class="ld-group-name" style="font-size:.68rem">Chemistry Masters</div></div>
+        </div>
+      </div>
+    </div>`
+
+  if (id === 'chat') return `
+    <div class="scene-label-row">
+      <div class="sl-num">03</div>
+      <div><div class="sl-text">Real-time group chat</div><div class="sl-sub">Share messages, files, images and YouTube links instantly</div></div>
+    </div>
+    <div class="dual-view">
+      <div class="device-laptop">
+        <div class="laptop-bar">
+          <div class="lb-dot" style="background:#f43f5e"></div><div class="lb-dot" style="background:#f59e0b;margin-left:4px"></div><div class="lb-dot" style="background:#10b981;margin-left:4px"></div>
+          <div class="lb-url">studysphere.vercel.app/groups/chemistry</div>
+        </div>
+        <div class="lp-chat">
+          <div class="lc-header"><div class="lc-dot" style="background:#f59e0b"></div><div class="lc-name">⚗️ Chemistry Masters</div><div class="lc-meta">4 members online</div></div>
+          <div class="lc-msgs">
+            <div class="lc-msg"><div class="lc-av" style="background:#00b5aa">AK</div><div style="display:flex;flex-direction:column;gap:.1rem"><div style="font-size:.6rem;color:rgba(255,255,255,.4);margin-left:.2rem">Amina K</div><div class="lc-bubble">Hey everyone! Welcome to the group 👋</div></div></div>
+            <div class="lc-msg"><div class="lc-av" style="background:#f59e0b">TJ</div><div style="display:flex;flex-direction:column;gap:.1rem"><div style="font-size:.6rem;color:rgba(255,255,255,.4);margin-left:.2rem">Tunde J</div><div class="lc-bubble">Thanks! Ready to ace chemistry 🔥</div></div></div>
+            <div class="lc-msg me"><div class="lc-bubble me">This is exactly what I needed! 🙌</div></div>
+          </div>
+          <div class="lc-input"><div class="lc-inp-txt" id="typingChat"><span class="cursor">|</span></div><div class="lc-send">↑</div></div>
+        </div>
+      </div>
+      <div class="device-mobile">
+        <div class="mobile-notch"><div class="mn-pill"></div></div>
+        <div class="mob-chat">
+          <div class="mob-header"><div class="mob-dot"></div><div class="mob-name">⚗️ Chemists</div><div class="mob-call">📹 Call</div></div>
+          <div class="mob-msgs">
+            <div class="mob-msg"><div class="mob-av" style="background:#00b5aa">AK</div><div class="mob-bub">Hey everyone! 👋</div></div>
+            <div class="mob-msg"><div class="mob-av" style="background:#f59e0b">TJ</div><div class="mob-bub">Ready to study! 🔥</div></div>
+            <div class="mob-msg me"><div class="mob-bub me">This is great! 🙌</div></div>
+          </div>
+          <div class="mob-input"><div class="mob-inp">Message…</div><div class="mob-snd">↑</div></div>
+        </div>
+      </div>
+    </div>`
+
+  if (id === 'ai') return `
+    <div class="scene-label-row">
+      <div class="sl-num">04</div>
+      <div><div class="sl-text">AI Study Assistant</div><div class="sl-sub">Type @ai in any group to get explanations, quizzes, and summaries</div></div>
+    </div>
+    <div class="dual-view">
+      <div class="device-laptop">
+        <div class="laptop-bar">
+          <div class="lb-dot" style="background:#f43f5e"></div><div class="lb-dot" style="background:#f59e0b;margin-left:4px"></div><div class="lb-dot" style="background:#10b981;margin-left:4px"></div>
+          <div class="lb-url">studysphere.vercel.app/groups/chemistry</div>
+        </div>
+        <div class="lp-chat">
+          <div class="lc-header"><div class="lc-dot" style="background:#00d4c8"></div><div class="lc-name">⚗️ Chemistry Masters</div><div class="lc-meta">AI Active ✦</div></div>
+          <div class="lc-msgs">
+            <div class="lc-msg me"><div class="lc-bubble me">@ai explain — what is chemical equilibrium?</div></div>
+            <div class="lc-ai"><div class="lc-ai-lbl">✦ AI Study Assistant</div><div class="lc-ai-txt" id="typingAI"><span class="cursor">|</span></div></div>
+          </div>
+          <div class="lc-input"><div class="lc-inp-txt">Type @ai quiz, @ai ask, or @ai explain…</div><div class="lc-send">↑</div></div>
+        </div>
+      </div>
+      <div class="device-mobile">
+        <div class="mobile-notch"><div class="mn-pill"></div></div>
+        <div class="mob-chat">
+          <div class="mob-header"><div class="mob-dot" style="background:#00d4c8"></div><div class="mob-name">AI Assistant</div></div>
+          <div class="mob-msgs">
+            <div class="mob-msg me"><div class="mob-bub me" style="font-size:.58rem">@ai explain equilibrium</div></div>
+            <div style="background:rgba(0,212,200,.1);border:1px solid rgba(0,212,200,.2);border-radius:7px;padding:.4rem .5rem;margin:.1rem 0">
+              <div style="font-size:.55rem;font-weight:800;color:#00d4c8;margin-bottom:.2rem">✦ AI Tutor</div>
+              <div style="font-size:.62rem;color:rgba(255,255,255,.75);line-height:1.35">When reactions occur at equal rates…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`
+
+  if (id === 'dm') return `
+    <div class="scene-label-row">
+      <div class="sl-num">05</div>
+      <div><div class="sl-text">Private direct messages</div><div class="sl-sub">Chat privately with any group member — real-time with notifications</div></div>
+    </div>
+    <div class="dual-view">
+      <div class="device-laptop">
+        <div class="laptop-bar">
+          <div class="lb-dot" style="background:#f43f5e"></div><div class="lb-dot" style="background:#f59e0b;margin-left:4px"></div><div class="lb-dot" style="background:#10b981;margin-left:4px"></div>
+          <div class="lb-url">studysphere.vercel.app/groups/chemistry</div>
+        </div>
+        <div class="lp-dm">
+          <div class="dm-list">
+            <div class="dm-list-title">Messages</div>
+            <div class="dm-item active"><div class="dm-item-av" style="background:#00b5aa">AK</div><div class="dm-item-info"><div class="dm-item-name">Amina K</div><div class="dm-item-last">See you in session!</div></div><div class="dm-badge">2</div></div>
+            <div class="dm-item"><div class="dm-item-av" style="background:#f59e0b">TJ</div><div class="dm-item-info"><div class="dm-item-name">Tunde J</div><div class="dm-item-last">Thanks for notes 🙏</div></div></div>
+            <div class="dm-item"><div class="dm-item-av" style="background:#8b5cf6">PR</div><div class="dm-item-info"><div class="dm-item-name">Priya R</div><div class="dm-item-last">Can you share file?</div></div></div>
+          </div>
+          <div class="dm-window">
+            <div class="dmw-hdr"><div class="dmw-hav">AK</div><div class="dmw-hname">Amina K</div></div>
+            <div class="dmw-msgs">
+              <div class="dmw-m"><div class="dmw-bub">Great session today! 🙌</div></div>
+              <div class="dmw-m me"><div class="dmw-bub me">Thanks! Same time next week?</div></div>
+              <div class="dmw-m"><div class="dmw-bub">See you in the session! ✓</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="device-mobile">
+        <div class="mobile-notch"><div class="mn-pill"></div></div>
+        <div style="padding:.6rem;display:flex;flex-direction:column;gap:.4rem">
+          <div style="font-size:.65rem;font-weight:800;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em">Messages</div>
+          <div style="display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.07);border-radius:8px;padding:.4rem .55rem">
+            <div style="width:20px;height:20px;border-radius:5px;background:#00b5aa;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:800;color:white">AK</div>
+            <div style="flex:1"><div style="font-size:.68rem;font-weight:700;color:white">Amina K</div><div style="font-size:.58rem;color:rgba(255,255,255,.35)">See you in session!</div></div>
+            <div style="background:#f43f5e;color:white;font-size:.55rem;font-weight:800;border-radius:100px;padding:.05rem .3rem">2</div>
+          </div>
+        </div>
+      </div>
+    </div>`
+
+  if (id === 'session') return `
+    <div class="scene-label-row">
+      <div class="sl-num">06</div>
+      <div><div class="sl-text">Schedule study sessions</div><div class="sl-sub">Create sessions, RSVP, and get a reminder 5 min before it starts</div></div>
+    </div>
+    <div class="dual-view">
+      <div class="device-laptop">
+        <div class="laptop-bar">
+          <div class="lb-dot" style="background:#f43f5e"></div><div class="lb-dot" style="background:#f59e0b;margin-left:4px"></div><div class="lb-dot" style="background:#10b981;margin-left:4px"></div>
+          <div class="lb-url">studysphere.vercel.app/dashboard</div>
+        </div>
+        <div class="lp-session">
+          <div class="ls-title">📅 Upcoming Sessions</div>
+          <div class="ls-card highlight">
+            <div class="ls-badge today">Today · 8:00 PM</div>
+            <div class="ls-card-name">Equilibrium Deep Dive</div>
+            <div class="ls-card-meta">⚗️ Chemistry Masters · 📍 Online · 4 attending</div>
+            <div class="ls-rsvp">
+              <div class="ls-rv active">✓ Going</div>
+              <div class="ls-rv">? Maybe</div>
+              <div class="ls-rv">✗ Can't</div>
+            </div>
+          </div>
+          <div class="ls-card">
+            <div class="ls-badge soon">Tomorrow · 3:00 PM</div>
+            <div class="ls-card-name">React Hooks Workshop</div>
+            <div class="ls-card-meta">💻 Web Dev Wizards · 📍 Online · 6 attending</div>
+          </div>
+        </div>
+      </div>
+      <div class="device-mobile">
+        <div class="mobile-notch"><div class="mn-pill"></div></div>
+        <div class="lp-session" style="padding:.65rem;gap:.45rem">
+          <div class="ls-title" style="font-size:.7rem">📅 Sessions</div>
+          <div class="ls-card highlight" style="padding:.5rem .65rem;gap:.3rem">
+            <div class="ls-badge today" style="font-size:.55rem">Today · 8PM</div>
+            <div class="ls-card-name" style="font-size:.72rem">Equilibrium Deep Dive</div>
+            <div class="ls-rsvp" style="gap:.25rem">
+              <div class="ls-rv active" style="font-size:.55rem">✓ Going</div>
+              <div class="ls-rv" style="font-size:.55rem">? Maybe</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`
+
+  return '<div style="padding:2rem;color:white">Scene not found</div>'
+}
+
+// Init
+renderScene()
+startProgress()
+</script>
+</body>
+</html>
