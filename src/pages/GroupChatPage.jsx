@@ -646,7 +646,10 @@ export default function GroupChatPage(){
 
           {showMembers&&(
             <aside className="members-panel">
-              <div className="mp-header">Members<span className="mp-count">{mc}</span></div>
+              <div className="mp-header">
+                Members <span className="mp-count">{mc}</span>
+                <button className="mp-close-btn" onClick={()=>setShowMembers(false)} title="Close">✕</button>
+              </div>
               <div className="mp-list">
                 {members.map(m=>{
                   const name=dname(m.users)
@@ -658,7 +661,11 @@ export default function GroupChatPage(){
                         <div className="mp-name">{isMe?'You':name}</div>
                         {m.role==='admin'&&<div className="mp-role">Admin</div>}
                       </div>
-                      {!isMe&&<button className="mp-dm-btn" onClick={()=>handleOpenDM(m)} title={`DM ${name}`}>💬</button>}
+                      {!isMe&&(
+                        <button className="mp-dm-btn" onClick={()=>handleOpenDM(m)} title={`Message ${name}`}>
+                          💬 DM
+                        </button>
+                      )}
                     </div>
                   )
                 })}
