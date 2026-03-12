@@ -7,6 +7,7 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { useDM } from '../context/DMContext'
 import AppLayout from '../components/AppLayout'
+import DMWindow from '../components/DMWindow'
 import SessionScheduler from '../components/SessionScheduler'
 import AIAssistant from '../components/AIAssistant'
 import './GroupChat.css'
@@ -157,7 +158,7 @@ export default function GroupChatPage(){
   const{id}=useParams()
   const{user}=useAuth()
   const navigate=useNavigate()
-  const { getOrCreateConv, openConversation } = useDM()
+  const { getOrCreateConv, conversations } = useDM()
 
   const[group,setGroup]=useState(null)
   const[members,setMembers]=useState([])
@@ -237,10 +238,9 @@ export default function GroupChatPage(){
   }
 
   function handleOpenDM(member){
-    const cid=dmChanId(user.id,member.user_id)
-    const conv=getOrCreateConv(cid,member.users)
-    openConversation(cid)
-    setDmTarget({conv,member})
+    const cid = dmChanId(user.id, member.user_id)
+    const conv = getOrCreateConv(cid, member.users)
+    setDmTarget({ ...conv, channelId: cid, otherUser: member.users })
   }
 
   function scrollToBottom(b='smooth'){bottomRef.current?.scrollIntoView({behavior:b})}
@@ -675,5 +675,13 @@ export default function GroupChatPage(){
         </div>
       </div>
     </AppLayout>
+
+    {/* DM Window — opens when you click 💬 DM on a member */}
+    {dmTarget && (
+      <DMWindow
+        conv={conversations[dmTarget.channelId] || dmTarget}
+        onClose={() => setDmTarget(null)}
+      />
+    )}
   )
 }

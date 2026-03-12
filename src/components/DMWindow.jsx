@@ -1,5 +1,6 @@
 // src/components/DMWindow.jsx
-// Floating DM chat window — real-time, optimistic, sound on receive
+// Floating DM chat window — always reads live data from DMContext
+// so messages appear instantly without needing to close/reopen
 
 import { useEffect, useRef, useState } from 'react'
 import { useDM } from '../context/DMContext'
@@ -19,53 +20,65 @@ function initials(name='') { return name.split(' ').map(w=>w[0]).join('').slice(
 function dname(u) { return u?.full_name || u?.email?.split('@')[0] || 'Unknown' }
 function fmtTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) }
 
-export default function DMWindow({ conv, onClose }) {
-  const { sendDM, openConversation } = useDM()
+export default function DMWindow({ conv: initialConv, onClose }) {
+  // ── KEY FIX: read live conversation from context, not from the stale prop ──
+  // initialConv gives us channelId + otherUser to identify the conversation.
+  // After that we always read messages from `conversations[channelId]` so any
+  // optimistic update or incoming realtime message appears immediately.
+  const { conversations, sendDM, openConversation } = useDM()
   const { user } = useAuth()
   const [input, setInput] = useState('')
   const bottomRef = useRef(null)
   const inputRef  = useRef(null)
 
-  const other = conv.otherUser
-  const channelId = conv.channelId
+  const channelId = initialConv?.channelId
+  const otherUser = initialConv?.otherUser
 
+  // Always get the freshest version of this conversation from context
+  const liveConv = conversations[channelId] || initialConv || { messages: [] }
+  const messages = liveConv.messages || []
+
+  // Mark conversation as open (clears unread) and focus input
   useEffect(() => {
-    openConversation(channelId)
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'instant' }), 50)
-    inputRef.current?.focus()
+    if (channelId) openConversation(channelId)
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+      inputRef.current?.focus()
+    }, 50)
   }, [channelId])
 
+  // Auto-scroll to bottom whenever a new message arrives
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [conv.messages?.length])
+  }, [messages.length])
 
   async function handleSend() {
     if (!input.trim()) return
-    const text = input; setInput('')
-    await sendDM(channelId, other?.id, text)
+    const text = input
+    setInput('') // clear immediately so it feels instant
+    await sendDM(channelId, otherUser?.id, text)
   }
 
   function handleKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
-  const messages = conv.messages || []
-
   return (
     <div className="dmw-root">
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div className="dmw-header">
-        <div className="dmw-av" style={{ background: avatarGrad(other?.id||'') }}>
-          {initials(dname(other))}
+        <div className="dmw-av" style={{ background: avatarGrad(otherUser?.id||'') }}>
+          {initials(dname(otherUser))}
         </div>
         <div className="dmw-hinfo">
-          <div className="dmw-name">{dname(other)}</div>
+          <div className="dmw-name">{dname(otherUser)}</div>
           <div className="dmw-status">Direct Message</div>
         </div>
         <button className="dmw-close" onClick={onClose} title="Close">✕</button>
       </div>
 
-      {/* Messages */}
+      {/* ── Messages ── */}
       <div className="dmw-messages">
         {messages.length === 0 && (
           <div className="dmw-empty">Start the conversation! 👋</div>
@@ -74,19 +87,25 @@ export default function DMWindow({ conv, onClose }) {
           const isMe = msg.sender_id === user.id
           const prev = messages[i - 1]
           const showAv = !isMe && (!prev || prev.sender_id !== msg.sender_id)
+          const isTemp = String(msg.id).startsWith('temp-')
           return (
-            <div key={msg.id} className={`dmw-msg${isMe ? ' me' : ''}`}>
+            <div key={msg.id} className={`dmw-msg${isMe ? ' me' : ''}${isTemp ? ' sending' : ''}`}>
               {!isMe && (
                 <div className="dmw-msg-av-col">
                   {showAv
-                    ? <div className="dmw-msg-av" style={{ background: avatarGrad(msg.sender_id) }}>{initials(dname(msg.sender))}</div>
+                    ? <div className="dmw-msg-av" style={{ background: avatarGrad(msg.sender_id) }}>
+                        {initials(dname(msg.sender))}
+                      </div>
                     : <div className="dmw-msg-av-space" />
                   }
                 </div>
               )}
               <div className="dmw-bubble-col">
                 <div className="dmw-bubble">{msg.content}</div>
-                <div className="dmw-time">{fmtTime(msg.created_at)}</div>
+                <div className="dmw-time">
+                  {fmtTime(msg.created_at)}
+                  {isMe && <span className="dmw-tick">{isTemp ? ' ○' : ' ✓'}</span>}
+                </div>
               </div>
             </div>
           )
@@ -94,12 +113,12 @@ export default function DMWindow({ conv, onClose }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+      {/* ── Input ── */}
       <div className="dmw-input-row">
         <input
           ref={inputRef}
           className="dmw-input"
-          placeholder={`Message ${dname(other)}…`}
+          placeholder={`Message ${dname(otherUser)}…`}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKey}
@@ -111,6 +130,7 @@ export default function DMWindow({ conv, onClose }) {
           disabled={!input.trim()}
         >↑</button>
       </div>
+
     </div>
   )
 }
